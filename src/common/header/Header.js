@@ -186,6 +186,9 @@ class Header extends Component{
             })
     }
 
+    goHomehandler = () => {
+        window.location.href="/";
+    }
      //closing modal
     closeModal =()=>{
         this.setState({ modalIsOpen: false })
@@ -455,7 +458,7 @@ class Header extends Component{
                     <AppBar position="static" style={css.appBar}>
                         {/*checking for screen size to make app responsive in smaller screen*/}
                         <Toolbar style={this.props.isSmallScreen ? css.toolBarSM : css.toolBar} >
-                            <IconButton edge="start" color="inherit">
+                            <IconButton edge="start" color="inherit" onClick={this.goHomehandler}>
                                 <FastfoodIcon/>
                             </IconButton>
                             {
