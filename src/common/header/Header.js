@@ -150,10 +150,6 @@ class Header extends Component {
     this.closeNotification = this.closeNotification.bind(this);
   }
 
-  handleMenuClose = () => {
-    this.setState({ anchorEl: null });
-  };
-
   //clearing the session variables on logout
   logout = () => {
     sessionStorage.removeItem("access-token");
