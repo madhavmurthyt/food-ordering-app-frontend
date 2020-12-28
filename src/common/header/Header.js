@@ -150,10 +150,6 @@ class Header extends Component {
     this.closeNotification = this.closeNotification.bind(this);
   }
 
-  goHomeHandler = () => {
-    window.location.href = "/";
-  };
-
   //closing modal
   closeModal = () => {
     this.setState({ modalIsOpen: false });
