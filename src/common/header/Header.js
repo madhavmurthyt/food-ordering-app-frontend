@@ -474,7 +474,6 @@ class Header extends Component {
                   <Button
                     variant="contained"
                     size="large"
-                    onClick={this.openMenuHandler}
                     startIcon={
                       <Icon size="large">
                         <AccountCircleIcon />
@@ -492,7 +491,6 @@ class Header extends Component {
                     anchorEl={this.state.anchorEl}
                     keepMounted
                     open={Boolean(this.state.anchorEl)}
-                    onClose={this.handleMenuClose}
                     style={{ top: "40px" }}
                   >
                     <MenuItem>
