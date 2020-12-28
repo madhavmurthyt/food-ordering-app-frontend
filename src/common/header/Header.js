@@ -29,7 +29,7 @@ import * as EmailVaildator from "email-validator";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {Link} from 'react-router-dom';
 import Notification from "../notification/Notification";
-
+import Config from "../utils/Config";
 
 
 const theme = createMuiTheme({
@@ -186,9 +186,10 @@ class Header extends Component{
             })
     }
 
-    goHomehandler = () => {
+    goHomeHandler = () => {
         window.location.href="/";
     }
+
      //closing modal
     closeModal =()=>{
         this.setState({ modalIsOpen: false })
@@ -236,7 +237,8 @@ class Header extends Component{
             if(this.isValidContactNoForLogin(this.state.contactno)){
                 let that= this;
                 const headers={'Accept':'application/json','authorization':"Basic " + window.btoa(this.state.contactno + ":" + this.state.password)}
-                fetch("http://localhost:8080/api/customer/login",{method:'POST',headers}).then(function (response){
+                let uri = Config.endpointPrefix + Config.endpoints.find(endpoint => endpoint.name === "Login").uri;
+                fetch(uri,{method:'POST',headers}).then(function (response){
                     if(response.status === 200){
                         //set session variable access token.
                         sessionStorage.setItem("access-token",  response.headers.get('access-token'));
@@ -303,7 +305,8 @@ class Header extends Component{
                 "password": this.state.signUpPassword,
             })
             const headers = {'Accept': 'application/json','Content-Type': 'application/json'}
-            fetch("http://localhost:8080/api/customer/signup",{method:'POST',headers,body:dataSignUp}).then(function (response){
+            let uri = Config.endpointPrefix + Config.endpoints.find(endpoint => endpoint.name === "Sign up").uri;
+            fetch(uri,{method:'POST',headers,body:dataSignUp}).then(function (response){
                 if(response.status === 201){
                     //set state variables on successful registration
                     that.setState({signUpErrorSpan:'dispNone'})
@@ -458,7 +461,7 @@ class Header extends Component{
                     <AppBar position="static" style={css.appBar}>
                         {/*checking for screen size to make app responsive in smaller screen*/}
                         <Toolbar style={this.props.isSmallScreen ? css.toolBarSM : css.toolBar} >
-                            <IconButton edge="start" color="inherit" onClick={this.goHomehandler}>
+                            <IconButton edge="start" color="inherit" onClick={this.goHomeHandler}>
                                 <FastfoodIcon/>
                             </IconButton>
                             {
@@ -596,6 +599,6 @@ class Header extends Component{
                 </Box>
             );
         }
-    }
+}
 
 export default (withMediaQuery() (Header));

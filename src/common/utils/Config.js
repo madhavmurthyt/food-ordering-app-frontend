@@ -21,6 +21,14 @@ var Config = {
             {
                 "name": "Save Order",
                 "uri": "/api/order"
+            },
+            {
+                "name" : "Login",
+                "uri" : "/api/customer/login"
+            },
+            {
+                "name" : "Sign up",
+                "uri" : "/api/customer/signup"
             }
         ]
 }
