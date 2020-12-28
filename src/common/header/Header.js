@@ -150,11 +150,6 @@ class Header extends Component {
     this.closeNotification = this.closeNotification.bind(this);
   }
 
-  //changing the tab on modal
-  onTabChange = (event, value) => {
-    this.setState({ value });
-  };
-
   openMenuHandler = (event) => {
     this.setState({ anchorEl: event.currentTarget });
   };
