@@ -209,7 +209,6 @@ class Header extends Component {
             that.setState({ loginErrorSpan: "dispNone" });
             that.setState({ value: 0 });
             that.setState({ loggedIn: true });
-            that.closeModal();
           })
           .catch((err) => {
             err.text().then((errorMessage) => {
@@ -427,11 +426,7 @@ class Header extends Component {
           <Toolbar
             style={this.props.isSmallScreen ? css.toolBarSM : css.toolBar}
           >
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={this.goHomeHandler}
-            >
+            <IconButton edge="start" color="inherit">
               <FastfoodIcon />
             </IconButton>
             {this.props.showSearch === true ? (
@@ -521,7 +516,6 @@ class Header extends Component {
           ariaHideApp={false}
           isOpen={this.state.modalIsOpen}
           contentLabel="Login"
-          onRequestClose={this.closeModal}
           style={costumStyles}
         >
           <Tabs
