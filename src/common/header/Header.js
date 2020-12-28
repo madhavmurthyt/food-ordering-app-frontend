@@ -150,10 +150,6 @@ class Header extends Component {
     this.closeNotification = this.closeNotification.bind(this);
   }
 
-  openMenuHandler = (event) => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
   handleMenuClose = () => {
     this.setState({ anchorEl: null });
   };
