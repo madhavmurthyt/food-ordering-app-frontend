@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import HomeRCard from "../../common/home/HomeRCard";
 import "./Home.css";
 import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
+
 import Header from "../../common/header/Header";
 import "../../../node_modules/font-awesome/css/font-awesome.css";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import Typography from "@material-ui/core/Typography";
 
 // Constants for varying screen size
 const withMediaQuery = () => (Component) => (props) => {
@@ -51,7 +52,7 @@ class Home extends Component {
         {this.mounted === true ? (
           <div>
             {/* Render Header component */}
-            <Header />
+            <Header searchHandler={this.searchHandler} showSearch={true} />
             {this.state.loading === true ? (
               <Typography
                 className="loading-spinner"
@@ -132,6 +133,31 @@ class Home extends Component {
   // Navigate to Restaurant Details page along with restaurantID clicked
   restaurantDetails = (restaurantId) => {
     this.props.history.push("/restaurant/" + restaurantId);
+  };
+
+  // Function to search for Restaurant
+  searchHandler = (event) => {
+    let that = this;
+    const headers = { Accept: "application/json" };
+    let url = "http://localhost:8080/api/restaurant/name/" + event.target.value;
+    that.setState({ loading: true });
+    if (event.target.value === "") {
+      this.getRestaurants();
+    } else {
+      return fetch(url, { method: "GET", headers })
+        .then((response) => {
+          return response.json();
+        })
+        .then((jsonResponse) => {
+          this.setState({
+            restaurants: jsonResponse.restaurants,
+            loading: false
+          });
+        })
+        .catch((error) => {
+          console.log("error user data", error);
+        });
+    }
   };
 }
 
