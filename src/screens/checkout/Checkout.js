@@ -106,7 +106,7 @@ class Checkout extends React.Component {
         this.msgAddressNotSelected = "Please select an address for delivery!";
         this.msgPaymentNotSelected = "Please select a payment method!";
     }
-
+    //for Delivery and Payment
     getSteps = () => ['Delivery', 'Payment'];
     handleNext = () => {
         if (this.state.activeStep === 0 && !this.state.order.address_id) {
@@ -140,7 +140,9 @@ class Checkout extends React.Component {
         }
 
     }
+    //Show Notification
     showNotification = (message) => this.setState({messageText: message, notificationOpen: true});
+    //Close Notification
     closeNotification = () => this.setState({messageText: null, notificationOpen: false});
     setAddressId = (id) => {
         let order = JSON.parse(JSON.stringify(this.state.order));
@@ -150,12 +152,13 @@ class Checkout extends React.Component {
             order: order
         });
     }
+    //set Payment
     setPaymentMethodId = (id) => {
         let order = JSON.parse(JSON.stringify(this.state.order));
         order.payment_id = id;
         this.setState({order: order});
     }
-
+    //set Address
     setAddresses = (result, response) => {
         if (result) {
             this.setState({addresses: response.addresses});
@@ -163,11 +166,12 @@ class Checkout extends React.Component {
             this.setState({addresses: null});
         }
     }
-
+    //get address
     getAddresses = () => CallApi(GetEndpointURI('Get Addresses'),
         GetHttpHeaders('GET', "Bearer " + window.sessionStorage.getItem("access-token")),
         this.setAddresses);
 
+    //set states
     setStates = (result, response) => {
         if (result) {
             this.setState({states: response.states});
@@ -176,9 +180,11 @@ class Checkout extends React.Component {
         }
     }
 
+    //get states
     getStates = () => CallApi(GetEndpointURI('Get States'),
         GetHttpHeaders('GET'), this.setStates);
 
+    //set payments
     setPaymentMethods = (result, response) => {
         if (result) {
             this.setState({paymentMethods: response.paymentMethods});
@@ -186,10 +192,11 @@ class Checkout extends React.Component {
             this.setState({paymentMethods: null});
         }
     }
-
+    //get Payment Options
     getPaymentOptions = () => CallApi(GetEndpointURI('Get Payment Modes'),
         GetHttpHeaders('GET'), this.setPaymentMethods);
 
+    //save Address
     saveAddress = (address, callback) => CallApi(GetEndpointURI('Save Address'),
         GetHttpHeaders('POST', "Bearer " + window.sessionStorage.getItem("access-token"),
             JSON.stringify(address)), callback, this.handleSaveAddress);
