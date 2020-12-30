@@ -422,7 +422,7 @@ class Header extends Component{
             return false;
         }
     }
-
+    //password validation
     isPasswordValid =(password) =>{
         const isValidPassword = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$');
         if(!isValidPassword.test(password) && !this.isPasswordEmpty(password)){
@@ -433,28 +433,35 @@ class Header extends Component{
             return true;
         }
     }
-
+    //on contact number change
     onContactNumberChange=(e)=>{
         this.setState({contactno:e.target.value})
     }
+    //on signup contact number change
     onSignUpContactNumberChange=(e)=>{
         this.setState({signUpContactno:e.target.value})
     }
+    //on password change
     onPasswordChange=(e)=>{
         this.setState({password:e.target.value})
     }
+    //on signup password change
     onSignUpPasswordChange=(e)=>{
         this.setState({signUpPassword:e.target.value})
     }
+    //on change of first name
     onChangeOfFirstName=(e)=>{
         this.setState({firstName:e.target.value})
     }
+    //on change of last name
     onChangeOfLastName=(e)=>{
         this.setState({lastName:e.target.value})
     }
+    //on change of email
     onChangeOfEmail=(e)=>{
         this.setState({email:e.target.value})
     }
+    //show notification
     showNotification = (message) => this.setState({messageText: message, notificationOpen: true});
     closeNotification = () => this.setState({messageText: null, notificationOpen: false});
 
