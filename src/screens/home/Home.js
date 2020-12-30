@@ -7,6 +7,7 @@ import Header from "../../common/header/Header";
 import "../../../node_modules/font-awesome/css/font-awesome.css";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Typography from "@material-ui/core/Typography";
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 // Constants for varying screen size
 const withMediaQuery = () => (Component) => (props) => {
@@ -45,6 +46,8 @@ class Home extends Component {
     this.getRestaurants();
   }
 
+
+
   render() {
     return (
       <div>
@@ -59,7 +62,8 @@ class Home extends Component {
                 variant="h4"
                 color="textSecondary"
               >
-                loading...
+                <CircularProgress disableShrink />
+
               </Typography>
             ) : (
               ""

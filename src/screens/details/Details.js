@@ -7,6 +7,7 @@ import DetailsMenuCard from "../../common/details/DetailsMenuCard";
 import DetailsCartCard from "../../common/details/DetailsCartCard";
 import Notification from "../../common/notification/Notification";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 // Constants for varying screen size
 const withMediaQuery = () => Component => props => {
@@ -55,7 +56,10 @@ class Details extends Component {
             <div>
                 {this.state.loading === true ?
                     <Typography className="loading-spinner" variant="h4"
-                                color="textSecondary">loading...</Typography>
+                                color="textSecondary">
+                        <CircularProgress disableShrink />
+
+                    </Typography>
                     : ""
                 }
                 {this.state.restaurant !== null ?
