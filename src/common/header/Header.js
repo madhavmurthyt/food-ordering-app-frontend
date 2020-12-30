@@ -200,11 +200,12 @@ class Header extends Component{
         this.setState({value});
     }
 
-
+    //open Menu handler
     openMenuHandler = (event) => {
         this.setState({anchorEl:event.currentTarget});
     };
 
+    //handle close menu
     handleMenuClose=()=>{
         this.setState({anchorEl:null});
     }
@@ -219,7 +220,7 @@ class Header extends Component{
         })
         this.handleMenuClose();
     }
-
+    // login click
     onLoginClick=()=>{
         let isAnyRequiredFieldEmpty=false;
         //checking if contact number is empty
@@ -268,6 +269,7 @@ class Header extends Component{
             }
         }
     }
+    //SignUp click function
     onSignUpClick=()=> {
         //check if any required input field is empty
         let isAnyRequiredFieldEmpty=false;
@@ -327,7 +329,7 @@ class Header extends Component{
         }
     }
 
-
+    //First Name Empty
     isFirstNameEmpty =(firstname) =>{
         if(firstname===""){
             this.setState({firstNameRequired:'dispBlock'})
@@ -347,7 +349,7 @@ class Header extends Component{
             return false;
         }
     }
-
+    //checking contact number
     isContactNumberEmpty =(contactno)=>{
         if(contactno===""){
             this.setState({signUpcontactnoRequired:'dispBlock'})
@@ -357,6 +359,7 @@ class Header extends Component{
             return false;
         }
     }
+    //checking contact number for login
     isContactNumberEmptyForLogin =(contactno)=>{
         if(contactno===""){
             this.setState({contactnoRequired:'dispBlock'})
@@ -366,6 +369,7 @@ class Header extends Component{
             return false;
         }
     }
+    //is password empty
     isPasswordEmpty=(password)=>{
         if(password===""){
             this.setState({signUpPasswordRequired:'dispBlock'})
@@ -375,7 +379,7 @@ class Header extends Component{
             return false;
         }
     }
-
+    //password during login
     isPasswordEmptyForLogin=(password)=>{
         if(password===""){
             this.setState({passwordRequired:'dispBlock'})
@@ -385,6 +389,7 @@ class Header extends Component{
             return false;
         }
     }
+    //is email valid
     isEmailIdValid = (email) =>{
         let isValid = EmailVaildator.validate(email)
         if(!isValid && !this.isEmailEmpty(email)){
@@ -395,7 +400,7 @@ class Header extends Component{
             return true;
         }
     }
-
+    //is contact number valid
     isValidContactNo =(contactno)=>{
         const isValidContactNo = new RegExp('^\\d{10}$');
         if(!isValidContactNo.test(contactno) && !this.isContactNumberEmpty(contactno)){
@@ -406,7 +411,7 @@ class Header extends Component{
             return false;
         }
     }
-
+    //is contact number valid during login
     isValidContactNoForLogin =(contactno)=>{
         const isValidContactNo = new RegExp('^\\d{10}$');
         if(isValidContactNo.test(contactno)){

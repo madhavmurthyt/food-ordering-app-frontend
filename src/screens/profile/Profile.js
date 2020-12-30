@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 import Header from "../../common/header/Header";
 
+//Profile page
 class Profile extends Component{
     render(){
         return(
