@@ -200,7 +200,7 @@ class Checkout extends React.Component {
     saveAddress = (address, callback) => CallApi(GetEndpointURI('Save Address'),
         GetHttpHeaders('POST', "Bearer " + window.sessionStorage.getItem("access-token"),
             JSON.stringify(address)), callback, this.handleSaveAddress);
-
+    //place order
     placeOrder = () => {
         if(this.state.activeStep === 2) {
             CallApi(GetEndpointURI('Save Order'),
@@ -210,7 +210,7 @@ class Checkout extends React.Component {
             this.showNotification(this.msgOrderIncomplete);
         }
     }
-
+    //get step content
     getStepContent = (step) => {
         const {classes} = this.props;
         switch (step) {
@@ -240,7 +240,7 @@ class Checkout extends React.Component {
                 return 'Unknown step';
         }
     }
-
+//create order
     createOrder = () => {
         let newOrder = {
             address_id: null,
@@ -263,7 +263,7 @@ class Checkout extends React.Component {
         this.setState({orderItems: JSON.parse(JSON.stringify(this.props.location.state.orderItems))});
 
     }
-
+    //component did mount  function
     componentDidMount() {
         if (this.props.location.state && this.props.location.state.restaurant &&
             this.props.location.state.totalAmount &&
