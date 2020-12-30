@@ -56,6 +56,7 @@ export default function SaveAddressForm(props) {
             setSaveClicked(false);
         }
     }
+    //onsave
     const onSave = (e) => {
         setSaveClicked(true);
         if (flatname && locality && city && state &&
@@ -69,6 +70,7 @@ export default function SaveAddressForm(props) {
             }, reset);
         }
     };
+    //pn menu props
     const menuProps = {
         'PaperProps': {
             style: {

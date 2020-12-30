@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: "2%",
     }
 }));
-
+//get state
 const getState = (length, index) => {
     let state = (length > 0) ? new Array(length).fill(false) : [];
     if (index < length && index >= 0) {
