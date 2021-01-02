@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 // Component for Details Restaurant Menu Card section
 export default function DetailsMenuCard(props) {
     let variant = props.isSmallScreen ? "subtitle2" : (props.isMediumScreen ? "subtitle1" : "body1") ;
-
+//it displas the menu details that can be added to cart and subtracted from the added list
     return (
         <div className="mcard-main">
             <Typography variant="button" color="textSecondary"

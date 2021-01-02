@@ -8,7 +8,8 @@ import "font-awesome/css/font-awesome.css"
 
 // Component for home restaurant card
 export default function HomeRCard(props) {
-
+//this displays the restaurant image with its image, average rate and customer ratings. The resturant 
+// image and other details comes from the database. 
     return (
             <Card className="restaurant-card-main" onClick={props.handleRestaurantNavigation.bind(this, props.restaurant.id)}>
                 <CardActionArea className="restaurant-card">
