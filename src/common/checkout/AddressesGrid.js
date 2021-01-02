@@ -85,6 +85,7 @@ export default function AddressesGrid(props) {
             props.setAddressId(e.currentTarget.id);
         }
     }
+    //displays a form that takes the customer adress and saves it 
     return (
         <Box width={1} textAlign="left">
             {

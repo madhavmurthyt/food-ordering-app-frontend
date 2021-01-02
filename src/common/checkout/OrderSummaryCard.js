@@ -16,7 +16,7 @@ import "font-awesome/css/font-awesome.css"
 
 // Component for Order Summary Card section
 export default function OrderSummaryCard(props) {
-
+//form takes the restaurant name and displays the add cart menu
     return (
         <Card className="order-summary-card">
             <CardContent>
