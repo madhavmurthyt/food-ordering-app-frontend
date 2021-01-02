@@ -54,7 +54,8 @@ const useStyles = makeStyles({
 export default function CartItem(props) {
 
     const classes = useStyles();
-
+//this js file has the card details and the item added to the cart by a customer at that time
+//the customer can add and remove the items from the cart and checkout
     return(
         <div className={classes.cartItemMain}>
             <Grid item xs={1} lg={1}>
