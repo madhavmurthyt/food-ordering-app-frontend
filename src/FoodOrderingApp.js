@@ -11,7 +11,7 @@ class FoodOrderingApp extends Component{
         super();
         this.baseUrl = "http://localhost:8080/api/";
     }
-
+//routing to home,resutaurant details with id ,checkout page and profile page
     render() {
         return(
             <Switch>
