@@ -17,6 +17,7 @@ export default function PaymentOptions(props) {
         setPaymentMode(e.target.value);
         props.setPaymentModeId(e.target.value);
     }
+//this will show the payment mode - payment using COD, debit card credit card 
     return (
         <Box padding="1%" margin="0%">
             <FormControl component="fieldset">

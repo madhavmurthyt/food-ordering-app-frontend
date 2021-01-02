@@ -78,6 +78,7 @@ export default function SaveAddressForm(props) {
             }
         }
     };
+    //form that takes the details like flat number,building number pincode ,Locality
     return (
         <Box width="60%" display="flex" flexDirection="column" padding="2%" margin="0%">
             <FormControl required margin="normal" size="small" variant="standard">
