@@ -47,7 +47,8 @@ class Home extends Component {
   }
 
 
-
+// this page helps to navigate to different resuturant card that is displayed - details like customer rating
+//average rate and name of resturant along with the image of resutanurant will be displayed
   render() {
     return (
       <div>
