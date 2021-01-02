@@ -180,11 +180,11 @@ class Checkout extends React.Component {
         }
     }
 
-    //get states
+    //get states name 
     getStates = () => CallApi(GetEndpointURI('Get States'),
         GetHttpHeaders('GET'), this.setStates);
 
-    //set payments
+    //set payment methods 
     setPaymentMethods = (result, response) => {
         if (result) {
             this.setState({paymentMethods: response.paymentMethods});
@@ -192,15 +192,15 @@ class Checkout extends React.Component {
             this.setState({paymentMethods: null});
         }
     }
-    //get Payment Options
+    //get Payment Options- cod,credit card, debit card
     getPaymentOptions = () => CallApi(GetEndpointURI('Get Payment Modes'),
         GetHttpHeaders('GET'), this.setPaymentMethods);
 
-    //save Address
+    //save Address of the cutomer
     saveAddress = (address, callback) => CallApi(GetEndpointURI('Save Address'),
         GetHttpHeaders('POST', "Bearer " + window.sessionStorage.getItem("access-token"),
             JSON.stringify(address)), callback, this.handleSaveAddress);
-    //place order
+    //place order based on resturant
     placeOrder = () => {
         if(this.state.activeStep === 2) {
             CallApi(GetEndpointURI('Save Order'),
