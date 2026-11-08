@@ -118,7 +118,7 @@ class Home extends Component {
   getRestaurants = () => {
     const headers = { Accept: "application/json" };
     let that = this;
-    let url = "http://localhost:8080/api/restaurant";
+    let url = this.props.baseUrl + "restaurant";
     that.setState({ loading: true });
     return fetch(url, { method: "GET", headers })
       .then((response) => {
@@ -144,7 +144,7 @@ class Home extends Component {
   searchHandler = (event) => {
     let that = this;
     const headers = { Accept: "application/json" };
-    let url = "http://localhost:8080/api/restaurant/name/" + event.target.value;
+    let url = this.props.baseUrl + "restaurant/name/" + event.target.value;
     that.setState({ loading: true });
     if (event.target.value === "") {
       this.getRestaurants();

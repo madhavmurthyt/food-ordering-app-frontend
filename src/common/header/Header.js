@@ -210,8 +210,16 @@ class Header extends Component{
         this.setState({anchorEl:null});
     }
 
-    //clearing the session variables on logout
     logout=()=>{
+        const accessToken = sessionStorage.getItem('access-token');
+        if (accessToken) {
+            const headers = {
+                'Accept': 'application/json',
+                'authorization': 'Bearer ' + accessToken,
+            };
+            fetch(Config.endpointPrefix + '/api/customer/logout', {method: 'POST', headers})
+                .catch(() => {});
+        }
         sessionStorage.removeItem('access-token');
         sessionStorage.removeItem('uuid');
         sessionStorage.removeItem('first-name');
@@ -273,7 +281,7 @@ class Header extends Component{
     onSignUpClick=()=> {
         //check if any required input field is empty
         let isAnyRequiredFieldEmpty=false;
-        let isAnyValidationFailed=true;
+        let isAnyValidationFailed=false;
         if (this.isFirstNameEmpty(this.state.firstName)) {
             isAnyRequiredFieldEmpty = true;
         }
@@ -286,17 +294,15 @@ class Header extends Component{
         if (this.isEmailEmpty(this.state.email)) {
             isAnyRequiredFieldEmpty = true;
         }
-        //check if user inputs are valid
         if (!this.isEmailIdValid(this.state.email)) {
-            isAnyValidationFailed = false;
+            isAnyValidationFailed = true;
         }
         if (!this.isPasswordValid(this.state.signUpPassword)) {
-            isAnyValidationFailed = false;
+            isAnyValidationFailed = true;
         }
         if (!this.isValidContactNo(this.state.signUpContactno)) {
-            isAnyValidationFailed = false;
+            isAnyValidationFailed = true;
         }
-        //try to register the user only when are required inout fields are not empty and are valid inputs
         if(isAnyValidationFailed===false && isAnyRequiredFieldEmpty===false){
             let that=this;
             let dataSignUp = JSON.stringify({

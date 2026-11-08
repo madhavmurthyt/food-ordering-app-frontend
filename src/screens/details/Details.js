@@ -136,73 +136,90 @@ class Details extends Component {
     // close Snackerbar notification
     closeNotification = () => this.setState({messageText: null, notificationOpen: false});
 
-    // function to handle item into cart
     addToCartHandler = (item) => {
-        let totalAmount = this.state.totalAmount;
-        let totalItems = this.state.totalItems;
-        totalAmount += item.price;
-        totalItems += 1;
+        const existingIndex = this.state.cartItems.findIndex(cItem => cItem.id === item.id);
+        let updatedCartItems;
 
-        let newItem =this.state.cartItem;
-        newItem.id = item.id;
-        newItem.name = item.item_name;
-        newItem.type = item.item_type;
-        newItem.quantity = 1;
-        newItem.price = item.price * newItem.quantity;
-        newItem.itemPrice = item.price;
-
-        if(this.state.cartItems.length !== 0 && this.state.cartItems.some(cItem => (cItem.id === item.id))){
-            const index = this.state.cartItems.findIndex(cItem => cItem.id === item.id);
-
-            const updateItem = this.state.cartItems[index];
-            updateItem.quantity = this.state.cartItems[index].quantity + 1;
-            updateItem.price = this.state.cartItems[index].price + item.price;
+        if (existingIndex !== -1) {
+            updatedCartItems = this.state.cartItems.map((cItem, i) => {
+                if (i === existingIndex) {
+                    return {
+                        ...cItem,
+                        quantity: cItem.quantity + 1,
+                        price: cItem.price + item.price,
+                    };
+                }
+                return cItem;
+            });
+        } else {
+            const newItem = {
+                id: item.id,
+                name: item.item_name,
+                type: item.item_type,
+                quantity: 1,
+                price: item.price,
+                itemPrice: item.price,
+            };
+            updatedCartItems = [...this.state.cartItems, newItem];
         }
-        else {
-            this.setState({cartItem: newItem})
-            this.setState({cartItem: {}});
-            this.state.cartItems.push(this.state.cartItem);
-        }
-        this.setState({totalAmount: totalAmount})
-        this.setState({totalItems: totalItems});
+
+        this.setState({
+            cartItems: updatedCartItems,
+            totalAmount: this.state.totalAmount + item.price,
+            totalItems: this.state.totalItems + 1,
+        });
         this.showNotification(this.msgItemAdded);
     }
 
-    // function to increase quantity of item in cart
     increaseCartItemHandler = (item) => {
-        const index = this.state.cartItems.findIndex(cItem => cItem.id === item.id);
-        const updateItem = this.state.cartItems[index];
-        updateItem.quantity = this.state.cartItems[index].quantity + 1;
-        updateItem.price = this.state.cartItems[index].price + item.itemPrice;
-        this.setState(item);
-        let totalAmount = this.state.totalAmount;
-        let totalItems = this.state.totalItems;
-        totalAmount += item.itemPrice;
-        totalItems += 1;
-        this.setState({totalAmount: totalAmount})
-        this.setState({totalItems: totalItems});
+        const updatedCartItems = this.state.cartItems.map(cItem => {
+            if (cItem.id === item.id) {
+                return {
+                    ...cItem,
+                    quantity: cItem.quantity + 1,
+                    price: cItem.price + item.itemPrice,
+                };
+            }
+            return cItem;
+        });
+
+        this.setState({
+            cartItems: updatedCartItems,
+            totalAmount: this.state.totalAmount + item.itemPrice,
+            totalItems: this.state.totalItems + 1,
+        });
         this.showNotification(this.msgItemIncreased);
     }
 
-    // function to decrease quantity of item in cart
     decreaseCartItemHandler = (item) => {
         const index = this.state.cartItems.findIndex(cItem => cItem.id === item.id);
-        const updateItem = this.state.cartItems[index];
-        if(updateItem.quantity === 1){
-            this.state.cartItems.splice(index, 1);
-            this.showNotification(this.msgItemRemoved);
-        }else if(updateItem.quantity > 1) {
-            updateItem.quantity = this.state.cartItems[index].quantity - 1;
-            updateItem.price = this.state.cartItems[index].price - item.itemPrice;
-            this.setState(item);
-            this.showNotification(this.msgItemDecreased);
+        const existing = this.state.cartItems[index];
+        let updatedCartItems;
+        let message;
+
+        if (existing.quantity === 1) {
+            updatedCartItems = this.state.cartItems.filter((_, i) => i !== index);
+            message = this.msgItemRemoved;
+        } else {
+            updatedCartItems = this.state.cartItems.map((cItem, i) => {
+                if (i === index) {
+                    return {
+                        ...cItem,
+                        quantity: cItem.quantity - 1,
+                        price: cItem.price - item.itemPrice,
+                    };
+                }
+                return cItem;
+            });
+            message = this.msgItemDecreased;
         }
-        let totalAmount = this.state.totalAmount;
-        let totalItems = this.state.totalItems;
-        totalAmount -= item.itemPrice;
-        totalItems -= 1;
-        this.setState({totalAmount: totalAmount})
-        this.setState({totalItems: totalItems});
+
+        this.setState({
+            cartItems: updatedCartItems,
+            totalAmount: this.state.totalAmount - item.itemPrice,
+            totalItems: this.state.totalItems - 1,
+        });
+        this.showNotification(message);
     }
 
     // function to navigate to checkout page
