@@ -1,16 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.css';
-import * as serviceWorker from './serviceWorker';
 import FoodOrderingApp from "./FoodOrderingApp";
 import {BrowserRouter as Router} from "react-router-dom";
 
-
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+root.render(
     <Router>
         <FoodOrderingApp/>
-    </Router>,
-    document.getElementById('root')
+    </Router>
 );
-
-serviceWorker.unregister();
