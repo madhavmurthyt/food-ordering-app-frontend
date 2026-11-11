@@ -1,77 +1,24 @@
-import React from 'react';
-
-import {
-    Box,
-    Stepper,
-    Step,
-    StepLabel,
-    StepContent,
-    Button,
-    Tabs,
-    Typography,
-    AppBar,
-    Tab,
-    useMediaQuery
-} from "@material-ui/core";
-
-import {
-    withStyles
-} from '@material-ui/core/styles';
-
-import {Redirect} from "react-router-dom";
+import React from "react";
+import Box from "@mui/material/Box";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepContent from "@mui/material/StepContent";
+import Button from "@mui/material/Button";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import { Navigate } from "react-router-dom";
+import withRouter from "../../common/utils/withRouter";
 import AddressesGrid from "../../common/checkout/AddressesGrid";
 import PaymentOptions from "../../common/checkout/PaymentOptions";
 import SaveAddressForm from "../../common/checkout/SaveAddressForm";
 import OrderSummaryCard from "../../common/checkout/OrderSummaryCard";
 import Notification from "../../common/notification/Notification";
-import {GetEndpointURI, GetHttpHeaders, CallApi} from "../../common/utils/ApiHelper";
+import { GetEndpointURI, GetHttpHeaders, CallApi } from "../../common/utils/ApiHelper";
 import Header from "../../common/header/Header";
-import "./Checkout.css";
+import Footer from "../../common/footer/Footer";
 
-//media query for responsiveness
-const useStyles = (theme) => ({
-    checkoutContainer: {
-        flexDirection: 'row',
-    },
-    checkoutContainerSm: {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    stepper: {
-        padding: "0%"
-    },
-    tab: {
-        maxWidth: "50%"
-    },
-    workflowStepperContainer: {
-        width: '72%',
-        padding: '1%'
-    },
-    workflowStepperContainerSm: {
-        width: '90%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        padding: '1%'
-    },
-    summaryCardContainer: {
-        width: '28%',
-    },
-    summaryCardContainerSm: {
-        width: '90%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginBottom: '5%',
-    },
-});
-
-const withMediaQuery = () => Component => props => {
-    const isSmallScreen = useMediaQuery('(max-width:650px)');
-    return <Component isSmallScreen={isSmallScreen} {...props} />;
-};
-
-
-// Checkout page rendering
 class Checkout extends React.Component {
     constructor(props) {
         super(props);
@@ -87,8 +34,8 @@ class Checkout extends React.Component {
             order: null,
             restaurantName: null,
             orderItems: null,
-            netAmount: 0
-        }
+            netAmount: 0,
+        };
         this.handleOrderConfirmation = this.handleOrderConfirmation.bind(this);
         this.placeOrder = this.placeOrder.bind(this);
         this.closeNotification = this.closeNotification.bind(this);
@@ -106,168 +53,190 @@ class Checkout extends React.Component {
         this.msgAddressNotSelected = "Please select an address for delivery!";
         this.msgPaymentNotSelected = "Please select a payment method!";
     }
-    //for Delivery and Payment
-    getSteps = () => ['Delivery', 'Payment'];
+
+    getSteps = () => ["Delivery", "Payment"];
+
     handleNext = () => {
         if (this.state.activeStep === 0 && !this.state.order.address_id) {
             this.showNotification(this.msgAddressNotSelected);
         } else if (this.state.activeStep === 1 && !this.state.order.payment_id) {
             this.showNotification(this.msgPaymentNotSelected);
         } else {
-            this.setState({activeStep: this.state.activeStep + 1});
+            this.setState({ activeStep: this.state.activeStep + 1 });
         }
-    }
-    handleBack = () => this.setState({activeStep: this.state.activeStep - 1});
-    handleReset = () => this.setState({activeStep: 0});
-    handleSwitch = (e, v) => this.setState({activeTab: v});
+    };
+
+    handleBack = () => this.setState({ activeStep: this.state.activeStep - 1 });
+    handleReset = () => this.setState({ activeStep: 0 });
+    handleSwitch = (e, v) => this.setState({ activeTab: v });
+
     handleSaveAddress = (result) => {
         if (result) {
-            this.setState({activeTab: 0});
+            this.setState({ activeTab: 0 });
             this.showNotification(this.msgSaveAddressOK);
             this.getAddresses();
         } else {
             this.showNotification(this.msgSaveAddressNotOK);
         }
-    }
+    };
+
     handleOrderConfirmation = (result, response) => {
         if (result) {
             this.showNotification(this.msgSaveOrderOK.replace("$orderId", response.id));
             setTimeout(() => {
-                this.props.history.push("/");
+                this.props.navigate("/");
             }, 3000);
         } else {
             this.showNotification(this.msgSaveOrderNotOK);
         }
+    };
 
-    }
-    //Show Notification
-    showNotification = (message) => this.setState({messageText: message, notificationOpen: true});
-    //Close Notification
-    closeNotification = () => this.setState({messageText: null, notificationOpen: false});
+    showNotification = (message) => this.setState({ messageText: message, notificationOpen: true });
+    closeNotification = () => this.setState({ messageText: null, notificationOpen: false });
+
     setAddressId = (id) => {
         let order = JSON.parse(JSON.stringify(this.state.order));
         order.address_id = id;
         this.setState({
-            addressIndex: this.state.addresses.findIndex(address => address.id === id),
-            order: order
+            addressIndex: this.state.addresses.findIndex((address) => address.id === id),
+            order: order,
         });
-    }
-    //set Payment
+    };
+
     setPaymentMethodId = (id) => {
         let order = JSON.parse(JSON.stringify(this.state.order));
         order.payment_id = id;
-        this.setState({order: order});
-    }
-    //set Address
+        this.setState({ order: order });
+    };
+
     setAddresses = (result, response) => {
-        if (result) {
-            this.setState({addresses: response.addresses});
-        } else {
-            this.setState({addresses: null});
-        }
-    }
-    //get address
-    getAddresses = () => CallApi(GetEndpointURI('Get Addresses'),
-        GetHttpHeaders('GET', "Bearer " + window.sessionStorage.getItem("access-token")),
-        this.setAddresses);
+        this.setState({ addresses: result ? response.addresses : null });
+    };
 
-    //set states
+    getAddresses = () =>
+        CallApi(
+            GetEndpointURI("Get Addresses"),
+            GetHttpHeaders("GET", "Bearer " + window.sessionStorage.getItem("access-token")),
+            this.setAddresses
+        );
+
     setStates = (result, response) => {
-        if (result) {
-            this.setState({states: response.states});
-        } else {
-            this.setState({states: null});
-        }
-    }
+        this.setState({ states: result ? response.states : null });
+    };
 
-    //get states name 
-    getStates = () => CallApi(GetEndpointURI('Get States'),
-        GetHttpHeaders('GET'), this.setStates);
+    getStates = () => CallApi(GetEndpointURI("Get States"), GetHttpHeaders("GET"), this.setStates);
 
-    //set payment methods 
     setPaymentMethods = (result, response) => {
-        if (result) {
-            this.setState({paymentMethods: response.paymentMethods});
-        } else {
-            this.setState({paymentMethods: null});
-        }
-    }
-    //get Payment Options- cod,credit card, debit card
-    getPaymentOptions = () => CallApi(GetEndpointURI('Get Payment Modes'),
-        GetHttpHeaders('GET'), this.setPaymentMethods);
+        this.setState({ paymentMethods: result ? response.paymentMethods : null });
+    };
 
-    //save Address of the cutomer
-    saveAddress = (address, callback) => CallApi(GetEndpointURI('Save Address'),
-        GetHttpHeaders('POST', "Bearer " + window.sessionStorage.getItem("access-token"),
-            JSON.stringify(address)), callback, this.handleSaveAddress);
-    //place order based on resturant
+    getPaymentOptions = () =>
+        CallApi(GetEndpointURI("Get Payment Modes"), GetHttpHeaders("GET"), this.setPaymentMethods);
+
+    saveAddress = (address, callback) =>
+        CallApi(
+            GetEndpointURI("Save Address"),
+            GetHttpHeaders(
+                "POST",
+                "Bearer " + window.sessionStorage.getItem("access-token"),
+                JSON.stringify(address)
+            ),
+            callback,
+            this.handleSaveAddress
+        );
+
     placeOrder = () => {
-        if(this.state.activeStep === 2) {
-            CallApi(GetEndpointURI('Save Order'),
-                GetHttpHeaders('POST', "Bearer " + window.sessionStorage.getItem("access-token"),
-                    JSON.stringify(this.state.order)), this.handleOrderConfirmation);
-        }else {
+        if (this.state.activeStep === 2) {
+            CallApi(
+                GetEndpointURI("Save Order"),
+                GetHttpHeaders(
+                    "POST",
+                    "Bearer " + window.sessionStorage.getItem("access-token"),
+                    JSON.stringify(this.state.order)
+                ),
+                this.handleOrderConfirmation
+            );
+        } else {
             this.showNotification(this.msgOrderIncomplete);
         }
-    }
-    //get step content
+    };
+
     getStepContent = (step) => {
-        const {classes} = this.props;
         switch (step) {
             case 0:
                 return (
-                    <Box><AppBar position="static">
-                        <Tabs value={this.state.activeTab} onChange={this.handleSwitch}>
-                            <Tab className={classes.tab} label="EXISTING ADDRESSES"/>
-                            <Tab className={classes.tab} label="NEW ADDRESS"/>
+                    <Box>
+                        <Tabs
+                            value={this.state.activeTab}
+                            onChange={this.handleSwitch}
+                            textColor="primary"
+                            indicatorColor="primary"
+                            sx={{ mb: 2 }}
+                        >
+                            <Tab label="Existing Addresses" sx={{ textTransform: "none" }} />
+                            <Tab label="New Address" sx={{ textTransform: "none" }} />
                         </Tabs>
-                    </AppBar>
-                        <Box display={this.state.activeTab === 0 ? "block" : "none"}>
-                            <AddressesGrid addresses={this.state.addresses} cols={(this.props.isSmallScreen) ? 2 : 3}
-                                           setAddressId={this.setAddressId}
-                                           selectedIndex={this.state.addressIndex}/>
+                        <Box sx={{ display: this.state.activeTab === 0 ? "block" : "none" }}>
+                            <AddressesGrid
+                                addresses={this.state.addresses}
+                                cols={3}
+                                setAddressId={this.setAddressId}
+                                selectedIndex={this.state.addressIndex}
+                            />
                         </Box>
-                        <Box display={this.state.activeTab === 1 ? "block" : "none"}>
-                            <SaveAddressForm states={this.state.states} handleSaveAddressOK={this.saveAddress}/>
+                        <Box sx={{ display: this.state.activeTab === 1 ? "block" : "none" }}>
+                            <SaveAddressForm
+                                states={this.state.states}
+                                handleSaveAddressOK={this.saveAddress}
+                            />
                         </Box>
                     </Box>
                 );
             case 1:
-                return (<PaymentOptions paymentModes={this.state.paymentMethods}
-                                        setPaymentModeId={this.setPaymentMethodId}
-                                        selectedPaymentMode={(!this.state.order) ? null : this.state.order.payment_id}/>);
+                return (
+                    <PaymentOptions
+                        paymentModes={this.state.paymentMethods}
+                        setPaymentModeId={this.setPaymentMethodId}
+                        selectedPaymentMode={!this.state.order ? null : this.state.order.payment_id}
+                    />
+                );
             default:
-                return 'Unknown step';
+                return "Unknown step";
         }
-    }
-//create order
+    };
+
     createOrder = () => {
         let newOrder = {
             address_id: null,
             bill: this.props.location.state.totalAmount,
             item_quantities: [],
             payment_id: null,
-            restaurant_id: this.props.location.state.restaurant.id
+            restaurant_id: this.props.location.state.restaurant.id,
         };
-        this.props.location.state.orderItems && (this.props.location.state.orderItems.length > 0) &&
-        this.props.location.state.orderItems.map(orderItem =>
-            newOrder.item_quantities.push({
-                item_id: orderItem.id,
-                quantity: orderItem.quantity,
-                price: orderItem.price
-            })
-        );
-        this.setState({order: newOrder});
-        this.setState({restaurantName: this.props.location.state.restaurant.restaurant_name});
-        this.setState({netAmount: this.props.location.state.totalAmount});
-        this.setState({orderItems: JSON.parse(JSON.stringify(this.props.location.state.orderItems))});
+        this.props.location.state.orderItems &&
+            this.props.location.state.orderItems.length > 0 &&
+            this.props.location.state.orderItems.map((orderItem) =>
+                newOrder.item_quantities.push({
+                    item_id: orderItem.id,
+                    quantity: orderItem.quantity,
+                    price: orderItem.price,
+                })
+            );
+        this.setState({
+            order: newOrder,
+            restaurantName: this.props.location.state.restaurant.restaurant_name,
+            netAmount: this.props.location.state.totalAmount,
+            orderItems: JSON.parse(JSON.stringify(this.props.location.state.orderItems)),
+        });
+    };
 
-    }
-    //component did mount  function
     componentDidMount() {
-        if (this.props.location.state && this.props.location.state.restaurant &&
+        if (
+            this.props.location.state &&
+            this.props.location.state.restaurant &&
             this.props.location.state.totalAmount &&
-            this.props.location.state.orderItems) {
+            this.props.location.state.orderItems
+        ) {
             this.createOrder();
             this.getAddresses();
             this.getStates();
@@ -276,65 +245,89 @@ class Checkout extends React.Component {
     }
 
     render() {
-        const {classes} = this.props;
-        if (this.props.location.state && this.props.location.state.restaurant &&
+        if (
+            this.props.location.state &&
+            this.props.location.state.restaurant &&
             this.props.location.state.totalAmount &&
-            this.props.location.state.orderItems) {
+            this.props.location.state.orderItems
+        ) {
             return (
-                <Box>
-                    <Header showSearch={false}/>
-                    <Box display="flex"
-                         className={(this.props.isSmallScreen) ? classes.checkoutContainerSm : classes.checkoutContainer}
-                         width="100%" mt="1%">
-                        <Box
-                            className={(this.props.isSmallScreen) ? classes.workflowStepperContainerSm : classes.workflowStepperContainer}>
-                            <Stepper className={classes.stepper} activeStep={this.state.activeStep}
-                                     orientation="vertical">
+                <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+                    <Header showSearch={false} />
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: { xs: "column", md: "row" },
+                            px: { xs: 2, md: 4 },
+                            py: 3,
+                            gap: 3,
+                        }}
+                    >
+                        <Box sx={{ flex: { md: 7 } }}>
+                            <Stepper
+                                activeStep={this.state.activeStep}
+                                orientation="vertical"
+                                sx={{ p: 0 }}
+                            >
                                 {this.getSteps().map((label, index) => (
                                     <Step key={label}>
                                         <StepLabel>{label}</StepLabel>
                                         <StepContent>
                                             {this.getStepContent(index)}
-                                            <Typography variant="h2" gutterBottom/>
-                                            <Box>
-                                                <Button disabled={this.state.activeStep === 0}
-                                                        onClick={this.handleBack}>Back</Button>
-                                                <Button variant="contained" color="primary" onClick={this.handleNext}>
-                                                    {this.state.activeStep === this.getSteps().length - 1 ? 'Finish' : 'Next'}
+                                            <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+                                                <Button
+                                                    disabled={this.state.activeStep === 0}
+                                                    onClick={this.handleBack}
+                                                >
+                                                    Back
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={this.handleNext}
+                                                >
+                                                    {this.state.activeStep === this.getSteps().length - 1
+                                                        ? "Finish"
+                                                        : "Next"}
                                                 </Button>
                                             </Box>
                                         </StepContent>
                                     </Step>
                                 ))}
                             </Stepper>
-                            {(this.state.activeStep === this.getSteps().length) ? (
-                                <Box padding="2%"><Typography variant="body1">View the summary and place your order
-                                    now!</Typography>
-                                    <Button onClick={this.handleReset}>
-                                        CHANGE
+                            {this.state.activeStep === this.getSteps().length && (
+                                <Box sx={{ p: 2 }}>
+                                    <Typography variant="body1">
+                                        View the summary and place your order now!
+                                    </Typography>
+                                    <Button onClick={this.handleReset} sx={{ mt: 1 }}>
+                                        Change
                                     </Button>
-                                </Box>) : ""
-                            }
+                                </Box>
+                            )}
                         </Box>
-                        <Box
-                            className={(this.props.isSmallScreen) ? classes.summaryCardContainerSm : classes.summaryCardContainer}
-                            padding="1%">
-                            <OrderSummaryCard restaurantName={this.state.restaurantName}
-                                              netAmount={this.state.netAmount}
-                                              orderItems={this.state.orderItems} order={this.state.order}
-                                              handlePlaceOrder={this.placeOrder}/>
+                        <Box sx={{ flex: { md: 3 } }}>
+                            <OrderSummaryCard
+                                restaurantName={this.state.restaurantName}
+                                netAmount={this.state.netAmount}
+                                orderItems={this.state.orderItems}
+                                order={this.state.order}
+                                handlePlaceOrder={this.placeOrder}
+                            />
                         </Box>
                     </Box>
-                    <Notification messageText={this.state.messageText} open={this.state.notificationOpen}
-                                  onClose={this.closeNotification}/>
+                    <Notification
+                        messageText={this.state.messageText}
+                        open={this.state.notificationOpen}
+                        onClose={this.closeNotification}
+                    />
+                    <Footer />
                 </Box>
             );
         } else {
-            return <Redirect to='/'/>;
+            return <Navigate to="/" replace />;
         }
-
-
     }
 }
 
-export default withStyles(useStyles)(withMediaQuery()(Checkout));
+export default withRouter(Checkout);

@@ -1,47 +1,84 @@
 import React from "react";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import AddIcon from '@material-ui/icons/Add';
-import IconButton from "@material-ui/core/IconButton";
-import Grid from "@material-ui/core/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
-// Component for Details Restaurant Menu Card section
-export default function DetailsMenuCard(props) {
-    let variant = props.isSmallScreen ? "subtitle2" : (props.isMediumScreen ? "subtitle1" : "body1") ;
-//it displas the menu details that can be added to cart and subtracted from the added list
+export default function DetailsMenuCard({ category, handleAddMenuItem }) {
     return (
-        <div className="mcard-main">
-            <Typography variant="button" color="textSecondary"
-                        className="mcard-category"> {props.category.category_name} </Typography>
-            <Divider/>
-            {props.category.item_list.map((item) => (
-                <span key={item.id + "item"} className="item-menu">
-                    <Grid item xs={1} lg={1}>
-                        <Typography>
-                            {item.item_type === "VEG" ?
-                                <i className="fa fa-circle item-veg" aria-hidden="true"/>
-                                : <i className="fa fa-circle item-nonveg" aria-hidden="true"/>
-                            }
+        <Box sx={{ mb: 3 }}>
+            <Typography
+                variant="overline"
+                color="text.secondary"
+                sx={{ fontWeight: 600, fontSize: "0.85rem", letterSpacing: 1 }}
+            >
+                {category.category_name}
+            </Typography>
+            <Divider sx={{ mb: 1.5 }} />
+            {category.item_list.map((item) => (
+                <Box
+                    key={item.id}
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        py: 1.5,
+                        px: 1,
+                        borderRadius: 1,
+                        transition: "background 0.15s",
+                        "&:hover": { bgcolor: "#FFF5F5" },
+                    }}
+                >
+                    <FiberManualRecordIcon
+                        sx={{
+                            fontSize: 12,
+                            mr: 1.5,
+                            color:
+                                item.item_type === "VEG" || item.item_type === "0"
+                                    ? "success.main"
+                                    : "error.main",
+                        }}
+                    />
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            flex: 1,
+                            textTransform: "capitalize",
+                            fontWeight: 500,
+                        }}
+                    >
+                        {item.item_name}
+                    </Typography>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            color: "text.secondary",
+                            mr: 2,
+                        }}
+                    >
+                        <CurrencyRupeeIcon sx={{ fontSize: 14 }} />
+                        <Typography variant="body2">
+                            {item.price.toFixed(2)}
                         </Typography>
-                    </Grid>
-                    <Grid item xs={6} lg={7}>
-                        <Typography variant={variant} className="item-name"> {item.item_name} </Typography>
-                    </Grid>
-                    <Grid item lg={1}/>
-                    <Grid item xs={3} lg={2}>
-                        <Typography variant={variant}> <i className="fa fa-inr"
-                                                        aria-hidden="true"/> {(item.price).toFixed(2)} </Typography>
-                    </Grid>
-                    <Grid item xs={1} lg={1}/>
-                    <Grid item xs={1} lg={1}>
-                        <IconButton className="item-add" value={item}
-                                    onClick={props.handleAddMenuItem.bind(this, item)}>
-                            <AddIcon/>
-                        </IconButton>
-                    </Grid>
-                </span>
-            ))
-            }
-        </div>
-    )
+                    </Box>
+                    <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleAddMenuItem(item)}
+                        sx={{
+                            border: "1px solid",
+                            borderColor: "primary.main",
+                            width: 30,
+                            height: 30,
+                        }}
+                    >
+                        <AddIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                </Box>
+            ))}
+        </Box>
+    );
 }

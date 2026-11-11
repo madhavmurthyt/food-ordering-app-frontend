@@ -3,9 +3,9 @@ import React from 'react';
 import {
     Snackbar,
     IconButton
-} from '@material-ui/core';
+} from '@mui/material';
 
-import Close from '@material-ui/icons/Close';
+import Close from '@mui/icons-material/Close';
 
 // Component for Snackerbar section
 export default function Notification(props) {

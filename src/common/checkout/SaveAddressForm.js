@@ -1,51 +1,20 @@
 import React from "react";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
 
-import {
-    Box,
-    FormControl,
-    FormHelperText,
-    Input,
-    InputLabel,
-    Select,
-    MenuItem,
-    Button,
-    Typography
-} from '@material-ui/core';
-
-import {
-    makeStyles
-} from '@material-ui/core/styles';
-
-//media query for responsiveness
-const useStyles = makeStyles({
-    show: {
-        display: 'block'
-    },
-    hide: {
-        display: 'none'
-    },
-    options: {
-        maxHeight: "40%",
-        marginTop: "3%",
-    },
-});
-
-// Component for Save Address section
-export default function SaveAddressForm(props) {
+export default function SaveAddressForm({ states, handleSaveAddressOK }) {
     const [flatname, setFlatname] = React.useState("");
     const [locality, setLocality] = React.useState("");
     const [city, setCity] = React.useState("");
     const [state, setState] = React.useState("");
     const [pincode, setPincode] = React.useState("");
     const [isSaveClicked, setSaveClicked] = React.useState(false);
-    const classes = useStyles();
-    const onFlatnameChanged = (e) => setFlatname(e.target.value);
-    const onLocalityChanged = (e) => setLocality(e.target.value);
-    const onCityChanged = (e) => setCity(e.target.value);
-    const onStateChanged = (e) => setState(e.target.value);
-    const onPincodeChanged = (e) => setPincode(e.target.value);
-    const display = (field) => (isSaveClicked && (field === null || field === "")) ? classes.show : classes.hide;
-    const validate = (field) => (isSaveClicked && field && (field.length !== 6 || isNaN(field))) ? classes.show : classes.hide;
+
+    const showError = (field) => isSaveClicked && (field === null || field === "");
+    const pincodeInvalid = isSaveClicked && pincode && (pincode.length !== 6 || isNaN(pincode));
+
     const reset = (isOK) => {
         if (isOK) {
             setFlatname("");
@@ -55,67 +24,122 @@ export default function SaveAddressForm(props) {
             setPincode("");
             setSaveClicked(false);
         }
-    }
-    //onsave
-    const onSave = (e) => {
+    };
+
+    const onSave = () => {
         setSaveClicked(true);
-        if (flatname && locality && city && state &&
-            pincode && pincode.length === 6 && !isNaN(pincode)) {
-            props.handleSaveAddressOK({
-                'city': city,
-                'flat_building_name': flatname,
-                'locality': locality,
-                'pincode': pincode,
-                'state_uuid': state,
-            }, reset);
+        if (
+            flatname &&
+            locality &&
+            city &&
+            state &&
+            pincode &&
+            pincode.length === 6 &&
+            !isNaN(pincode)
+        ) {
+            handleSaveAddressOK(
+                {
+                    city: city,
+                    flat_building_name: flatname,
+                    locality: locality,
+                    pincode: pincode,
+                    state_uuid: state,
+                },
+                reset
+            );
         }
     };
-    //pn menu props
-    const menuProps = {
-        'PaperProps': {
-            style: {
-                maxHeight: "24%"
-            }
-        }
-    };
-    //form that takes the details like flat number,building number pincode ,Locality
+
     return (
-        <Box width="60%" display="flex" flexDirection="column" padding="2%" margin="0%">
-            <FormControl required margin="normal" size="small" variant="standard">
-                <InputLabel htmlFor="flatname">Flat / Building No</InputLabel>
-                <Input id="flatname" type="text" value={flatname} onChange={onFlatnameChanged}/>
-                <FormHelperText error className={display(flatname)}>required</FormHelperText>
-            </FormControl>
-            <FormControl required margin="normal" size="small" variant="standard">
-                <InputLabel htmlFor="locality">Locality</InputLabel>
-                <Input id="locality" type="text" value={locality} onChange={onLocalityChanged}/>
-                <FormHelperText error className={display(locality)}>required</FormHelperText>
-            </FormControl>
-            <FormControl required margin="normal" size="small" variant="standard">
-                <InputLabel htmlFor="city">City</InputLabel>
-                <Input id="city" type="text" value={city} onChange={onCityChanged}/>
-                <FormHelperText error className={display(city)}>required</FormHelperText>
-            </FormControl>
-            <FormControl required margin="normal" size="small" variant="standard">
-                <InputLabel htmlFor="state">State</InputLabel>
-                <Select id='state' MenuProps={menuProps} value={state} onChange={onStateChanged}>
-                    {props.states && props.states.map((state, index) => (
-                        <MenuItem key={state.id} value={state.id} index={index}>{state.state_name}</MenuItem>
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                maxWidth: 400,
+                py: 3,
+                px: 1,
+            }}
+        >
+            <TextField
+                label="Flat / Building No"
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                value={flatname}
+                onChange={(e) => setFlatname(e.target.value)}
+                error={showError(flatname)}
+                helperText={showError(flatname) ? "required" : ""}
+            />
+            <TextField
+                label="Locality"
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                value={locality}
+                onChange={(e) => setLocality(e.target.value)}
+                error={showError(locality)}
+                helperText={showError(locality) ? "required" : ""}
+            />
+            <TextField
+                label="City"
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                error={showError(city)}
+                helperText={showError(city) ? "required" : ""}
+            />
+            <TextField
+                label="State"
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                select
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                error={showError(state)}
+                helperText={showError(state) ? "required" : ""}
+                SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: 200 } } } }}
+            >
+                {states &&
+                    states.map((s) => (
+                        <MenuItem key={s.id} value={s.id}>
+                            {s.state_name}
+                        </MenuItem>
                     ))}
-                </Select>
-                <FormHelperText error className={display(state)}>required</FormHelperText>
-            </FormControl>
-            <FormControl required margin="normal" size="small" variant="standard">
-                <InputLabel htmlFor="pincode">Pincode</InputLabel>
-                <Input id="pincode" type="text" value={pincode} onChange={onPincodeChanged}/>
-                <FormHelperText error className={display(pincode)}>required</FormHelperText>
-                <FormHelperText error className={validate(pincode)}>Pincode must contain only numbers and must be 6
-                    digits long</FormHelperText>
-            </FormControl>
-            <FormControl margin="normal" size="small" variant="standard">
-                <Typography variant="h2" gutterBottom/>
-                <Button variant="contained" color="secondary" id="btn-save" onClick={onSave}>SAVE ADDRESS</Button>
-            </FormControl>
+            </TextField>
+            <TextField
+                label="Pincode"
+                variant="outlined"
+                size="small"
+                required
+                fullWidth
+                value={pincode}
+                onChange={(e) => setPincode(e.target.value)}
+                error={showError(pincode) || pincodeInvalid}
+                helperText={
+                    showError(pincode)
+                        ? "required"
+                        : pincodeInvalid
+                        ? "Pincode must contain only numbers and must be 6 digits long"
+                        : ""
+                }
+            />
+            <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={onSave}
+                sx={{ mt: 1 }}
+            >
+                Save Address
+            </Button>
         </Box>
     );
 }

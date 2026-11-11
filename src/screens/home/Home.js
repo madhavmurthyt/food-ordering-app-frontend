@@ -1,169 +1,183 @@
 import React, { Component } from "react";
-import HomeRCard from "../../common/home/HomeRCard";
-import "./Home.css";
-import Box from "@material-ui/core/Box";
-
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Skeleton from "@mui/material/Skeleton";
+import Card from "@mui/material/Card";
 import Header from "../../common/header/Header";
-import "../../../node_modules/font-awesome/css/font-awesome.css";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import Typography from "@material-ui/core/Typography";
-import CircularProgress from '@material-ui/core/CircularProgress';
+import HeroBanner from "../../common/home/HeroBanner";
+import CategoryBar from "../../common/home/CategoryBar";
+import HomeRCard from "../../common/home/HomeRCard";
+import withRouter from "../../common/utils/withRouter";
+import Footer from "../../common/footer/Footer";
 
-// Constants for varying screen size
-const withMediaQuery = () => (Component) => (props) => {
-  const isXtraSmallScreen = useMediaQuery("(max-width:650px)");
-  const isSmallScreen = useMediaQuery("(max-width:1000px)");
-  const isMediumScreen = useMediaQuery("(max-width:1350px)");
-  return (
-    <Component
-      isSmallScreen={isSmallScreen}
-      isMediumScreen={isMediumScreen}
-      isXtraSmallScreen={isXtraSmallScreen}
-      {...props}
-    />
-  );
-};
-
-// Home page rendering
 class Home extends Component {
-  constructor() {
-    super();
-    this.state = {
-      restaurants: [],
-      loading: false
-    };
-    this.handleRestaurantNavigation = this.handleRestaurantNavigation.bind(
-      this
-    );
-  }
-
-  handleRestaurantNavigation = (restaurantId) =>
-    this.restaurantDetails(restaurantId);
-
-  //
-  componentDidMount() {
-    this.mounted = true;
-    this.getRestaurants();
-  }
-
-
-// this page helps to navigate to different resuturant card that is displayed - details like customer rating
-//average rate and name of resturant along with the image of resutanurant will be displayed
-  render() {
-    return (
-      <div>
-        {/* Render components only after mounted is true */}
-        {this.mounted === true ? (
-          <div>
-            {/* Render Header component */}
-            <Header searchHandler={this.searchHandler} showSearch={true} />
-            {this.state.loading === true ? (
-              <Typography
-                className="loading-spinner"
-                variant="h4"
-                color="textSecondary"
-              >
-                <CircularProgress disableShrink />
-
-              </Typography>
-            ) : (
-              ""
-            )}
-            <div
-              className={
-                this.state.restaurants.length === 0
-                  ? "noRestaurantMsg"
-                  : "card-container"
-              }
-            >
-              {this.state.restaurants.length === 0 &&
-              this.state.loading !== true ? (
-                <Typography variant="h6">
-                  No restaurant with the given name.
-                </Typography>
-              ) : (
-                this.state.restaurants.map((restaurant) => (
-                  <Box
-                    key={restaurant.id}
-                    className={
-                      this.props.isXtraSmallScreen
-                        ? "card-mainXSM"
-                        : this.props.isSmallScreen
-                        ? "card-mainSM"
-                        : this.props.isMediumScreen
-                        ? "card-mainM"
-                        : "card-main"
-                    }
-                  >
-                    {/* Render Restaurant cards components */}
-                    <HomeRCard
-                      restaurant={restaurant}
-                      handleRestaurantNavigation={
-                        this.handleRestaurantNavigation
-                      }
-                    />
-                  </Box>
-                ))
-              )}
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
-      </div>
-    );
-  }
-
-  // Fetches the restaurants from backend
-  getRestaurants = () => {
-    const headers = { Accept: "application/json" };
-    let that = this;
-    let url = this.props.baseUrl + "restaurant";
-    that.setState({ loading: true });
-    return fetch(url, { method: "GET", headers })
-      .then((response) => {
-        return response.json();
-      })
-      .then((jsonResponse) => {
-        that.setState({
-          restaurants: jsonResponse.restaurants,
-          loading: false
-        });
-      })
-      .catch((error) => {
-        console.log("error user data", error);
-      });
-  };
-
-  // Navigate to Restaurant Details page along with restaurantID clicked
-  restaurantDetails = (restaurantId) => {
-    this.props.history.push("/restaurant/" + restaurantId);
-  };
-
-  // Function to search for Restaurant
-  searchHandler = (event) => {
-    let that = this;
-    const headers = { Accept: "application/json" };
-    let url = this.props.baseUrl + "restaurant/name/" + event.target.value;
-    that.setState({ loading: true });
-    if (event.target.value === "") {
-      this.getRestaurants();
-    } else {
-      return fetch(url, { method: "GET", headers })
-        .then((response) => {
-          return response.json();
-        })
-        .then((jsonResponse) => {
-          this.setState({
-            restaurants: jsonResponse.restaurants,
-            loading: false
-          });
-        })
-        .catch((error) => {
-          console.log("error user data", error);
-        });
+    constructor() {
+        super();
+        this.state = {
+            restaurants: [],
+            categories: [],
+            activeCategory: null,
+            loading: false,
+        };
     }
-  };
+
+    componentDidMount() {
+        this.mounted = true;
+        this.getRestaurants();
+        this.getCategories();
+    }
+
+    handleRestaurantNavigation = (restaurantId) => {
+        this.props.navigate("/restaurant/" + restaurantId);
+    };
+
+    render() {
+        return (
+            <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+                <Header searchHandler={this.searchHandler} showSearch={false} />
+                <HeroBanner searchHandler={this.searchHandler} />
+
+                {this.state.categories.length > 0 && (
+                    <CategoryBar
+                        categories={this.state.categories}
+                        activeCategory={this.state.activeCategory}
+                        onCategoryClick={this.onCategoryClick}
+                    />
+                )}
+
+                <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
+                    {this.state.loading ? (
+                        <Grid container spacing={3}>
+                            {[1, 2, 3, 4].map((i) => (
+                                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+                                    <Card sx={{ maxWidth: 320, mx: "auto" }}>
+                                        <Skeleton
+                                            variant="rectangular"
+                                            height={200}
+                                        />
+                                        <Box sx={{ p: 2 }}>
+                                            <Skeleton width="80%" />
+                                            <Skeleton width="60%" />
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : this.state.restaurants.length === 0 ? (
+                        <Box sx={{ textAlign: "center", py: 8 }}>
+                            <Typography
+                                variant="h6"
+                                color="text.secondary"
+                                sx={{ fontWeight: 500 }}
+                            >
+                                No restaurant with the given name.
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <Grid container spacing={3}>
+                            {this.state.restaurants.map((restaurant) => (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    sm={6}
+                                    md={4}
+                                    lg={3}
+                                    key={restaurant.id}
+                                >
+                                    <HomeRCard
+                                        restaurant={restaurant}
+                                        handleRestaurantNavigation={
+                                            this.handleRestaurantNavigation
+                                        }
+                                    />
+                                </Grid>
+                            ))}
+                        </Grid>
+                    )}
+                </Box>
+                <Footer />
+            </Box>
+        );
+    }
+
+    getRestaurants = () => {
+        const headers = { Accept: "application/json" };
+        let url = this.props.baseUrl + "restaurant";
+        this.setState({ loading: true });
+        return fetch(url, { method: "GET", headers })
+            .then((response) => response.json())
+            .then((jsonResponse) => {
+                this.setState({
+                    restaurants: jsonResponse.restaurants,
+                    loading: false,
+                });
+            })
+            .catch((error) => {
+                console.log("error fetching restaurants", error);
+                this.setState({ loading: false });
+            });
+    };
+
+    getCategories = () => {
+        const headers = { Accept: "application/json" };
+        let url = this.props.baseUrl + "category";
+        return fetch(url, { method: "GET", headers })
+            .then((response) => response.json())
+            .then((jsonResponse) => {
+                this.setState({ categories: jsonResponse.categories || [] });
+            })
+            .catch((error) => {
+                console.log("error fetching categories", error);
+            });
+    };
+
+    onCategoryClick = (category) => {
+        this.setState({ activeCategory: category });
+        if (category === null) {
+            this.getRestaurants();
+        } else {
+            const headers = { Accept: "application/json" };
+            let url =
+                this.props.baseUrl + "restaurant/category/" + category.id;
+            this.setState({ loading: true });
+            fetch(url, { method: "GET", headers })
+                .then((response) => response.json())
+                .then((jsonResponse) => {
+                    this.setState({
+                        restaurants: jsonResponse.restaurants || [],
+                        loading: false,
+                    });
+                })
+                .catch((error) => {
+                    console.log("error fetching by category", error);
+                    this.setState({ loading: false });
+                });
+        }
+    };
+
+    searchHandler = (event) => {
+        const headers = { Accept: "application/json" };
+        let url =
+            this.props.baseUrl + "restaurant/name/" + event.target.value;
+        this.setState({ loading: true, activeCategory: null });
+        if (event.target.value === "") {
+            this.getRestaurants();
+        } else {
+            return fetch(url, { method: "GET", headers })
+                .then((response) => response.json())
+                .then((jsonResponse) => {
+                    this.setState({
+                        restaurants: jsonResponse.restaurants || [],
+                        loading: false,
+                    });
+                })
+                .catch((error) => {
+                    console.log("error searching restaurants", error);
+                    this.setState({ loading: false });
+                });
+        }
+    };
 }
 
-export default withMediaQuery()(Home);
+export default withRouter(Home);

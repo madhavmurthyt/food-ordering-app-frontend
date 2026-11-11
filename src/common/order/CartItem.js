@@ -1,92 +1,105 @@
 import React from "react";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import AddIcon from "@material-ui/icons/Add";
-import RemoveIcon from '@material-ui/icons/Remove';
-import { makeStyles } from '@material-ui/core/styles';
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
-//media query for responsiveness
-const useStyles = makeStyles({
-        cartItemMain: {
-        flexDirection: 'row',
-        display: 'flex',
-        padding: '5px 0'
-    },
-    itemVeg: {
-        color: '#5a9a5a',
-    },
-    itemNonveg: {
-        color: '#be4a47'
-    },
-    itemName: {
-        textTransform: 'capitalize',
-        color: 'gray'
-    },
-    citemQuantity: {
-        textAlign: 'center',
-    },
-    amount: {
-        textAlign: 'end !important',
-        color: 'gray'
-    },
-    addRemoveIcon:{
-        justifyContent: 'center',
-            display: 'flex',
-        flexDirection: 'row',
-        '& button': {
-            padding: '0',
-            fontSize: 'small',
-            '&:hover': {
-                background: '#eacc5d',
-            },
-        },
-        '& p': {
-            width: '20px',
-        },
-        '& .MuiSvgIcon-root': {
-            color: '#000',
-        }
-    }
-});
-
-// Component for Cart Item section
-export default function CartItem(props) {
-
-    const classes = useStyles();
-//this js file has the card details and the item added to the cart by a customer at that time
-//the customer can add and remove the items from the cart and checkout
-    return(
-        <div className={classes.cartItemMain}>
-            <Grid item xs={1} lg={1}>
-                <Typography variant={props.variant}>
-                    {props.cartItem.type === "VEG" ?
-                    <i className={classes.itemVeg + " fa fa-stop-circle-o"} aria-hidden="true"/>
-                        : <i className={classes.itemNonveg + " fa fa-stop-circle-o"} aria-hidden="true"/>
-                    }
+export default function CartItem({
+    cartItem,
+    handleAddCartItem,
+    handleRemoveCartItem,
+    editable,
+}) {
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                alignItems: "center",
+                py: 1,
+                gap: 1,
+            }}
+        >
+            <FiberManualRecordIcon
+                sx={{
+                    fontSize: 10,
+                    color:
+                        cartItem.type === "VEG" || cartItem.type === "0"
+                            ? "success.main"
+                            : "error.main",
+                }}
+            />
+            <Typography
+                variant="body2"
+                sx={{
+                    flex: 1,
+                    textTransform: "capitalize",
+                    color: "text.secondary",
+                    fontWeight: 500,
+                }}
+            >
+                {cartItem.name}
+            </Typography>
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                }}
+            >
+                {editable && (
+                    <IconButton
+                        size="small"
+                        onClick={() => handleRemoveCartItem(cartItem)}
+                        sx={{
+                            width: 24,
+                            height: 24,
+                            "&:hover": { bgcolor: "secondary.light" },
+                        }}
+                    >
+                        <RemoveIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                )}
+                <Typography
+                    variant="body2"
+                    sx={{
+                        minWidth: 20,
+                        textAlign: "center",
+                        fontWeight: 600,
+                    }}
+                >
+                    {cartItem.quantity}
                 </Typography>
-            </Grid>
-            <Grid item xs={4} lg={6}>
-                <Typography variant={props.variant} className={classes.itemName}> {props.cartItem.name} </Typography>
-            </Grid>
-            <Grid item xs={3} lg={2} className={classes.citemQuantity}>
-                <div className={classes.addRemoveIcon}>
-                    {
-                        (props.editable) &&
-                        <IconButton size='small' value={props.cartItem}
-                                    onClick={props.handleRemoveCartItem.bind(this, props.cartItem)}> <RemoveIcon/> </IconButton>
-                    }
-                    <Typography variant={props.variant}> {props.cartItem.quantity} </Typography>
-                    {
-                        (props.editable) &&
-                        <IconButton size='small' value={props.cartItem}
-                                    onClick={props.handleAddCartItem.bind(this, props.cartItem)}> <AddIcon/> </IconButton>
-                    }
-                </div>
-            </Grid>
-            <Grid item xs={4} lg={3} className={classes.amount}>
-                <Typography variant={props.variant}> <i className="fa fa-inr" aria-hidden="true"/> {(props.cartItem.price).toFixed(2)} </Typography>
-            </Grid>
-        </div>
-    )
+                {editable && (
+                    <IconButton
+                        size="small"
+                        onClick={() => handleAddCartItem(cartItem)}
+                        sx={{
+                            width: 24,
+                            height: 24,
+                            "&:hover": { bgcolor: "secondary.light" },
+                        }}
+                    >
+                        <AddIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                )}
+            </Box>
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    minWidth: 60,
+                    justifyContent: "flex-end",
+                    color: "text.secondary",
+                }}
+            >
+                <CurrencyRupeeIcon sx={{ fontSize: 12 }} />
+                <Typography variant="body2">
+                    {cartItem.price.toFixed(2)}
+                </Typography>
+            </Box>
+        </Box>
+    );
 }

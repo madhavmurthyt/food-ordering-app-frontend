@@ -1,137 +1,103 @@
-import React from 'react';
+import React from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
-import {
-    Card,
-    CardContent,
-    Box,
-    Typography,
-    GridListTile,
-    GridList,
-    CardActions,
-    IconButton,
-} from '@material-ui/core';
-
-import {
-    CheckCircleRounded
-} from "@material-ui/icons";
-
-import {
-    makeStyles
-} from '@material-ui/core/styles';
-
-//media query for responsiveness
-const useStyles = makeStyles((theme) => ({
-    active: {
-        fill: 'green',
-        pointerEvents: "none"
-    },
-    inactive: {
-        fill: 'gray',
-        pointerEvents: "none"
-    },
-    gridList: {
-        flexWrap: 'nowrap',
-        margin: "0%",
-        padding: "1%",
-        // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-        transform: 'translateZ(0)',
-    },
-    gridTile: {
-        height: 'auto',
-    },
-    selected: {
-        boxShadow: '2px 2px 8px 0px #f50057',
-        borderColor: '#f50057',
-        border: 'solid',
-    },
-    addressCard: {
-        padding: "1%",
-        margin: "3%"
-    },
-    cardContent: {
-        paddingTop: "2%",
-        paddingLeft: "4%",
-        paddingRight: "4%",
-        paddingBottom: "1%",
-    },
-    cardActions: {
-        paddingTop: "1%",
-        paddingLeft: "4%",
-        paddingRight: "4%",
-        paddingBottom: "2%",
-    }
-}));
-//get state
 const getState = (length, index) => {
-    let state = (length > 0) ? new Array(length).fill(false) : [];
+    let state = length > 0 ? new Array(length).fill(false) : [];
     if (index < length && index >= 0) {
-        state[index] = true
+        state[index] = true;
     }
     return state;
-}
+};
 
-// Component for Existing Address grid section
-export default function AddressesGrid(props) {
+export default function AddressesGrid({ addresses, cols, setAddressId, selectedIndex }) {
     const [selected, setSelected] = React.useState(
-        (props.addresses !== null && props.addresses.length > 0) ?
-            [...getState(props.addresses.length, props.selectedIndex)] : []
+        addresses !== null && addresses.length > 0
+            ? [...getState(addresses.length, selectedIndex)]
+            : []
     );
 
-    const classes = useStyles();
-    const getClass = (active) => (active) ? classes.active : classes.inactive;
     const onClick = (e) => {
         if (e.currentTarget.value !== null) {
-            setSelected(getState(props.addresses.length, e.currentTarget.value));
-            props.setAddressId(e.currentTarget.id);
+            setSelected(getState(addresses.length, e.currentTarget.value));
+            setAddressId(e.currentTarget.id);
         }
-    }
-    //displays a form that takes the customer adress and saves it 
+    };
+
     return (
-        <Box width={1} textAlign="left">
-            {
-                (props.addresses !== null && props.addresses.length > 0) ? (
-                    <GridList className={classes.gridList} cols={props.cols} cellHeight="auto">
-                        {
-                            props.addresses.map((address, index) => (
-                                <GridListTile className={classes.gridTile} key={address.id}>
-                                    <Card className={"customer-address " + classes.addressCard + " " +
-                                    (selected[index] && classes.selected)} raised={selected[index] === true}>
-                                        <CardContent className={classes.cardContent}>
-                                            <Box display="flex" flexDirection="column" alignItems="flex-start">
-                                                <Typography className="address-line"
-                                                            variant="subtitle2">{address.flat_building_name}</Typography>
-                                                <Typography className="address-line"
-                                                            variant="subtitle2">{address.locality}</Typography>
-                                                <Typography className="address-line"
-                                                            variant="subtitle2">{address.city}</Typography>
-                                                <Typography className="address-line"
-                                                            variant="subtitle2">{address.state.state_name}</Typography>
-                                                <Typography className="address-line"
-                                                            variant="subtitle2">{address.pincode}</Typography>
-                                            </Box>
-                                        </CardContent>
-                                        <CardActions disableSpacing className={classes.cardActions}>
-                                            <Box width="100%" display="inline" textAlign="right">
-                                                <IconButton size="medium" id={address.id} value={index}
-                                                            onClick={onClick}>
-                                                    <CheckCircleRounded fontSize="large"
-                                                                        className={getClass(selected[index])}/>
-                                                </IconButton>
-                                            </Box>
-                                        </CardActions>
-                                    </Card>
-                                </GridListTile>
-                            ))
-                        }
-                    </GridList>) : (
-                    <Box padding="2%">
-                        <Typography variant="h3" gutterBottom/>
-                        <Typography className="payment-method" variant="body1" color="textSecondary">
-                            {"There are no saved addresses! You can save an address using the 'New Address' tab or using your ‘Profile’ menu option."}
-                        </Typography>
-                    </Box>
-                )
-            }
+        <Box sx={{ textAlign: "left", py: 2 }}>
+            {addresses !== null && addresses.length > 0 ? (
+                <Grid container spacing={2}>
+                    {addresses.map((address, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={address.id}>
+                            <Card
+                                sx={{
+                                    borderLeft: selected[index]
+                                        ? "4px solid"
+                                        : "4px solid transparent",
+                                    borderColor: selected[index]
+                                        ? "primary.main"
+                                        : "transparent",
+                                    bgcolor: selected[index]
+                                        ? "#FFF5F5"
+                                        : "background.paper",
+                                    transition: "all 0.2s",
+                                    cursor: "pointer",
+                                }}
+                                elevation={selected[index] ? 3 : 1}
+                            >
+                                <CardContent sx={{ pb: 0 }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                        {address.flat_building_name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {address.locality}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {address.city}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {address.state.state_name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {address.pincode}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: "flex-end" }}>
+                                    <IconButton
+                                        id={address.id}
+                                        value={index}
+                                        onClick={onClick}
+                                    >
+                                        <CheckCircleRoundedIcon
+                                            sx={{
+                                                fontSize: 28,
+                                                color: selected[index]
+                                                    ? "primary.main"
+                                                    : "grey.400",
+                                            }}
+                                        />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+            ) : (
+                <Box sx={{ py: 4 }}>
+                    <Typography variant="body1" color="text.secondary">
+                        There are no saved addresses! You can save an address
+                        using the &apos;New Address&apos; tab or using your
+                        &apos;Profile&apos; menu option.
+                    </Typography>
+                </Box>
+            )}
         </Box>
     );
 }

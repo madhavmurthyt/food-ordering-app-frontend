@@ -1,143 +1,153 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
 import Header from "../../common/header/Header";
-import Typography from "@material-ui/core/Typography";
-import './Details.css';
 import DetailsRCard from "../../common/details/DetailsRCard";
 import DetailsMenuCard from "../../common/details/DetailsMenuCard";
 import DetailsCartCard from "../../common/details/DetailsCartCard";
+import PopularItems from "../../common/details/PopularItems";
 import Notification from "../../common/notification/Notification";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import withRouter from "../../common/utils/withRouter";
+import Footer from "../../common/footer/Footer";
 
-// Constants for varying screen size
-const withMediaQuery = () => Component => props => {
-    const isSmallScreen = useMediaQuery('(max-width:700px)');
-    const isMediumScreen = useMediaQuery('(max-width:1000px)');
-    return <Component isSmallScreen={isSmallScreen} isMediumScreen={isMediumScreen} {...props} />;
-};
-
-// Details page rendering
 class Details extends Component {
     constructor() {
         super();
         this.state = {
             restaurant: null,
-            cartItem: {id:null, name:null, type:null, quantity:0, price:0, itemPrice:0},
+            popularItems: [],
             cartItems: [],
             totalAmount: 0,
             totalItems: 0,
             notificationOpen: false,
-            loggedIn: sessionStorage.getItem("access-token") !== null,
-        }
-        this.handleAddMenuItem = this.handleAddMenuItem.bind(this);
-        this.handleAddCartItem = this.handleAddCartItem.bind(this);
-        this.handleRemoveCartItem = this.handleRemoveCartItem.bind(this);
-        this.handleCheckoutClick = this.handleCheckoutClick.bind(this);
-        this.closeNotification = this.closeNotification.bind(this);
+            loading: false,
+        };
         this.msgItemAdded = "Item added to cart!";
-        this.msgItemRemoved = "item removed from cart!"
+        this.msgItemRemoved = "Item removed from cart!";
         this.msgItemIncreased = "Item quantity increased by 1!";
         this.msgItemDecreased = "Item quantity decreased by 1!";
         this.msgLoginNotOk = "Please login first!";
         this.msgEmptyCart = "Please add an item to your cart!";
     }
 
-    handleAddMenuItem = (item) => this.addToCartHandler(item);
-    handleAddCartItem = (item) => this.increaseCartItemHandler(item);
-    handleRemoveCartItem = (item) => this.decreaseCartItemHandler(item);
-    handleCheckoutClick = () => this.checkout();
-
     componentDidMount() {
         this.getRestaurant();
+        this.getPopularItems();
     }
 
     render() {
         return (
-            <div>
-                {this.state.loading === true ?
-                    <Typography className="loading-spinner" variant="h4"
-                                color="textSecondary">
-                        <CircularProgress disableShrink />
+            <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+                <Header showSearch={false} />
 
-                    </Typography>
-                    : ""
-                }
-                {this.state.restaurant !== null ?
-                    <div>
-                        {/*Header section*/}
-                        <Header searchHandler={this.searchHandler}/>
+                {this.state.loading && (
+                    <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                        <CircularProgress color="primary" />
+                    </Box>
+                )}
 
-                        {/*Restaurant Details section*/}
-                        <div className="restaurant-section">
-                            <DetailsRCard restaurant={this.state.restaurant} isSmallScreen={this.props.isSmallScreen}/>
-                        </div>
-                        <div className={this.props.isSmallScreen ? "section2SM" : "section2" }>
+                {this.state.restaurant !== null && (
+                    <>
+                        <DetailsRCard restaurant={this.state.restaurant} />
 
-                            {/*Restaurant Menu section*/}
-                            <div className={this.props.isSmallScreen ? "item-sectionSM" : "item-section"}>
-                                {this.state.restaurant.categories.map((category, index) => (
-                                    <span key={category.id + "category"}>
-                                        <DetailsMenuCard category={category}
-                                                         handleAddMenuItem={this.handleAddMenuItem}
-                                                         isSmallScreen={this.props.isSmallScreen}
-                                                         isMediumScreen={this.props.isMediumScreen}/>
-                                    </span>
-                                ))
-                                }
-                            </div>
+                        <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
+                            <Grid container spacing={3}>
+                                {/* Menu Section */}
+                                <Grid item xs={12} md={7}>
+                                    <PopularItems
+                                        items={this.state.popularItems}
+                                        onAddItem={this.addToCartHandler}
+                                    />
+                                    {this.state.restaurant.categories.map(
+                                        (category) => (
+                                            <DetailsMenuCard
+                                                key={category.id}
+                                                category={category}
+                                                handleAddMenuItem={
+                                                    this.addToCartHandler
+                                                }
+                                            />
+                                        )
+                                    )}
+                                </Grid>
 
-                            {/*Checkout Cart section*/}
-                            <div className={this.props.isSmallScreen ? "cart-sectionSM" : (this.props.isMediumScreen ? "cart-sectionM" : "cart-section") }>
-                                <DetailsCartCard cartItems={this.state.cartItems}
-                                                 totalAmount={this.state.totalAmount}
-                                                 totalItems={this.state.totalItems}
-                                                 handleAddCartItem={this.handleAddCartItem}
-                                                 handleRemoveCartItem={this.handleRemoveCartItem}
-                                                 handleCheckoutClick={this.handleCheckoutClick}
-                                                 isSmallScreen={this.props.isSmallScreen}
-                                                 isMediumScreen={this.props.isMediumScreen}/>
-                            </div>
-                        </div>
-                        {this.state.notificationOpen === true ?
-                            <Notification messageText={this.state.messageText} open={this.state.notificationOpen}
-                                          onClose={this.closeNotification}/>
-                            : ""
-                        }
-                    </div>
-                    : ""}
-            </div>
-        )
+                                {/* Cart Sidebar */}
+                                <Grid item xs={12} md={5}>
+                                    <DetailsCartCard
+                                        cartItems={this.state.cartItems}
+                                        totalAmount={this.state.totalAmount}
+                                        totalItems={this.state.totalItems}
+                                        handleAddCartItem={
+                                            this.increaseCartItemHandler
+                                        }
+                                        handleRemoveCartItem={
+                                            this.decreaseCartItemHandler
+                                        }
+                                        handleCheckoutClick={this.checkout}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Box>
+
+                        {this.state.notificationOpen && (
+                            <Notification
+                                messageText={this.state.messageText}
+                                open={this.state.notificationOpen}
+                                onClose={this.closeNotification}
+                            />
+                        )}
+                    </>
+                )}
+                <Footer />
+            </Box>
+        );
     }
 
-    // Fetches the restaurant from backend
     getRestaurant() {
-        const headers = {'Accept': 'application/json'};
-        let that = this;
-        let url = this.props.baseUrl + '/restaurant/' + this.props.match.params.restaurantId;
-        that.setState({loading: true})
-        return fetch(url,
-            {method: 'GET', headers}
-        ).then((response) => {
-            return response.json();
-        }).then((jsonResponse) => {
-            this.setState({
-                restaurant: jsonResponse,
-                address: jsonResponse.address,
-                categories: jsonResponse.categories,
-                loading: false,
+        const headers = { Accept: "application/json" };
+        let url =
+            this.props.baseUrl + "restaurant/" + this.props.params.restaurantId;
+        this.setState({ loading: true });
+        return fetch(url, { method: "GET", headers })
+            .then((response) => response.json())
+            .then((jsonResponse) => {
+                this.setState({
+                    restaurant: jsonResponse,
+                    loading: false,
+                });
             })
-        }).catch((error) => {
-            console.log('error user data', error);
-        });
+            .catch((error) => {
+                console.log("error fetching restaurant", error);
+                this.setState({ loading: false });
+            });
     }
 
-    // show notification on Snackerbar
-    showNotification = (message) => this.setState({messageText: message, notificationOpen: true});
-    // close Snackerbar notification
-    closeNotification = () => this.setState({messageText: null, notificationOpen: false});
+    getPopularItems() {
+        const headers = { Accept: "application/json" };
+        let url =
+            this.props.baseUrl +
+            "item/restaurant/" +
+            this.props.params.restaurantId;
+        fetch(url, { method: "GET", headers })
+            .then((response) => response.json())
+            .then((jsonResponse) => {
+                this.setState({ popularItems: jsonResponse || [] });
+            })
+            .catch((error) => {
+                console.log("error fetching popular items", error);
+            });
+    }
+
+    showNotification = (message) =>
+        this.setState({ messageText: message, notificationOpen: true });
+    closeNotification = () =>
+        this.setState({ messageText: null, notificationOpen: false });
 
     addToCartHandler = (item) => {
-        const existingIndex = this.state.cartItems.findIndex(cItem => cItem.id === item.id);
+        const existingIndex = this.state.cartItems.findIndex(
+            (cItem) => cItem.id === item.id
+        );
         let updatedCartItems;
 
         if (existingIndex !== -1) {
@@ -169,10 +179,10 @@ class Details extends Component {
             totalItems: this.state.totalItems + 1,
         });
         this.showNotification(this.msgItemAdded);
-    }
+    };
 
     increaseCartItemHandler = (item) => {
-        const updatedCartItems = this.state.cartItems.map(cItem => {
+        const updatedCartItems = this.state.cartItems.map((cItem) => {
             if (cItem.id === item.id) {
                 return {
                     ...cItem,
@@ -182,23 +192,26 @@ class Details extends Component {
             }
             return cItem;
         });
-
         this.setState({
             cartItems: updatedCartItems,
             totalAmount: this.state.totalAmount + item.itemPrice,
             totalItems: this.state.totalItems + 1,
         });
         this.showNotification(this.msgItemIncreased);
-    }
+    };
 
     decreaseCartItemHandler = (item) => {
-        const index = this.state.cartItems.findIndex(cItem => cItem.id === item.id);
+        const index = this.state.cartItems.findIndex(
+            (cItem) => cItem.id === item.id
+        );
         const existing = this.state.cartItems[index];
         let updatedCartItems;
         let message;
 
         if (existing.quantity === 1) {
-            updatedCartItems = this.state.cartItems.filter((_, i) => i !== index);
+            updatedCartItems = this.state.cartItems.filter(
+                (_, i) => i !== index
+            );
             message = this.msgItemRemoved;
         } else {
             updatedCartItems = this.state.cartItems.map((cItem, i) => {
@@ -220,26 +233,26 @@ class Details extends Component {
             totalItems: this.state.totalItems - 1,
         });
         this.showNotification(message);
-    }
+    };
 
-    // function to navigate to checkout page
     checkout = () => {
-        if(this.state.cartItems.length === 0){
+        if (this.state.cartItems.length === 0) {
             this.showNotification(this.msgEmptyCart);
-        }
-        else if(this.state.cartItems.length > 0 && sessionStorage.getItem("access-token") == null){
+        } else if (
+            this.state.cartItems.length > 0 &&
+            sessionStorage.getItem("access-token") == null
+        ) {
             this.showNotification(this.msgLoginNotOk);
-        }
-        else {
-            this.props.history.push({
-                pathname: '/checkout/',
+        } else {
+            this.props.navigate("/checkout/", {
                 state: {
                     orderItems: this.state.cartItems,
-                    totalAmount: this.state.totalAmount, restaurant: this.state.restaurant
-                }
+                    totalAmount: this.state.totalAmount,
+                    restaurant: this.state.restaurant,
+                },
             });
         }
-    }
+    };
 }
 
-export default (withMediaQuery() (Details));
+export default withRouter(Details);

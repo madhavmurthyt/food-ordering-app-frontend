@@ -1,27 +1,19 @@
-import React, {Component} from "react";
-import {Route, Switch} from "react-router-dom";
+import React from "react";
+import {Route, Routes} from "react-router-dom";
 import Home from "./screens/home/Home";
 import Details from "./screens/details/Details";
 import Checkout from "./screens/checkout/Checkout";
 import Profile from "./screens/profile/Profile"
 
-// Class to handle Routing
-class FoodOrderingApp extends Component{
-    constructor() {
-        super();
-        this.baseUrl = "http://localhost:8080/api/";
-    }
-//routing to home,resutaurant details with id ,checkout page and profile page
-    render() {
-        return(
-            <Switch>
-                <Route exact path="/" render={(props) => <Home {...props} baseUrl={this.baseUrl}/>} />
-                <Route exact path='/restaurant/:restaurantId' render={(props) => <Details {...props} baseUrl={this.baseUrl}/>}/>
-                <Route exact path="/checkout" render={(props) => <Checkout {...props} baseUrl={this.baseUrl}/>}/>
-                <Route exact path='/profile' render={(props) => <Profile {...props} />}/>
-            </Switch>
-        )
-    }
+const baseUrl = "http://localhost:8080/api/";
 
+export default function FoodOrderingApp() {
+    return (
+        <Routes>
+            <Route path="/" element={<Home baseUrl={baseUrl}/>}/>
+            <Route path="/restaurant/:restaurantId" element={<Details baseUrl={baseUrl}/>}/>
+            <Route path="/checkout" element={<Checkout baseUrl={baseUrl}/>}/>
+            <Route path="/profile" element={<Profile/>}/>
+        </Routes>
+    );
 }
-export default FoodOrderingApp;
