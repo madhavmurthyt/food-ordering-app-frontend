@@ -45,6 +45,10 @@ var Config = {
             {
                 "name": "Delete Address",
                 "uri": "/api/address"
+            },
+            {
+                "name": "Google Login",
+                "uri": "/api/customer/google-login"
             }
         ]
 }
