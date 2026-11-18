@@ -5,8 +5,10 @@ import Details from "./screens/details/Details";
 import Checkout from "./screens/checkout/Checkout";
 import Profile from "./screens/profile/Profile"
 import Login from "./screens/login/Login"
+import Admin from "./screens/admin/Admin"
+import Config from "./common/utils/Config";
 
-const baseUrl = "http://localhost:8080/api/";
+const baseUrl = Config.endpointPrefix + "/api/";
 
 function ScrollToTop() {
     const { pathname } = useLocation();
@@ -24,6 +26,7 @@ export default function FoodOrderingApp() {
             <Route path="/checkout" element={<Checkout baseUrl={baseUrl}/>}/>
             <Route path="/profile" element={<Profile/>}/>
             <Route path="/login" element={<Login/>}/>
+            <Route path="/admin" element={<Admin/>}/>
         </Routes>
         </>
     );

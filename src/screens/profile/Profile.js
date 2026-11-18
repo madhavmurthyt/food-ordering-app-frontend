@@ -15,6 +15,7 @@ import Config from "../../common/utils/Config";
 import { GetEndpointURI, GetHttpHeaders, CallApi } from "../../common/utils/ApiHelper";
 import withRouter from "../../common/utils/withRouter";
 import Footer from "../../common/footer/Footer";
+import { isLoggedIn } from "../../common/utils/AuthGuard";
 
 class Profile extends Component {
     constructor(props) {
@@ -36,8 +37,8 @@ class Profile extends Component {
     }
 
     componentDidMount() {
-        if (!sessionStorage.getItem("access-token")) {
-            this.props.navigate("/");
+        if (!isLoggedIn()) {
+            this.props.navigate("/login");
             return;
         }
         this.fetchOrders();

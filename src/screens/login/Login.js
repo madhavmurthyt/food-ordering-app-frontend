@@ -12,6 +12,7 @@ import Footer from "../../common/footer/Footer";
 import Config from "../../common/utils/Config";
 import brand from "../../theme/brand";
 import * as EmailValidator from "email-validator";
+import { isLoggedIn } from "../../common/utils/AuthGuard";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function Login() {
     const [notification, setNotification] = useState({ open: false, message: "" });
 
     useEffect(() => {
-        if (sessionStorage.getItem("access-token")) {
+        if (isLoggedIn()) {
             navigate("/");
         }
     }, [navigate]);
@@ -62,6 +63,7 @@ export default function Login() {
                 .then((data) => {
                     sessionStorage.setItem("uuid", data.id);
                     sessionStorage.setItem("first-name", data.first_name);
+                    if (data.role) sessionStorage.setItem("role", data.role);
                     navigate("/");
                 })
                 .catch(() => {
@@ -122,6 +124,7 @@ export default function Login() {
             .then((data) => {
                 sessionStorage.setItem("uuid", data.id);
                 sessionStorage.setItem("first-name", data.first_name);
+                if (data.role) sessionStorage.setItem("role", data.role);
                 navigate("/");
             })
             .catch((err) => {

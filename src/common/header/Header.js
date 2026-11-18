@@ -60,6 +60,7 @@ class Header extends Component {
         sessionStorage.removeItem("access-token");
         sessionStorage.removeItem("uuid");
         sessionStorage.removeItem("first-name");
+        sessionStorage.removeItem("role");
         this.setState({ loggedIn: false });
         this.handleMenuClose();
     };

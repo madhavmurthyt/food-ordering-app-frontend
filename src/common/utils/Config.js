@@ -1,5 +1,5 @@
 var Config = {
-    "endpointPrefix": "http://localhost:8080",
+    "endpointPrefix": process.env.REACT_APP_API_URL || "http://localhost:8080",
     "endpoints":
         [
             {
@@ -49,6 +49,30 @@ var Config = {
             {
                 "name": "Google Login",
                 "uri": "/api/customer/google-login"
+            },
+            {
+                "name": "Admin Dashboard",
+                "uri": "/api/admin/dashboard"
+            },
+            {
+                "name": "Admin Users",
+                "uri": "/api/admin/users"
+            },
+            {
+                "name": "Admin User Role",
+                "uri": "/api/admin/users"
+            },
+            {
+                "name": "Admin Restaurants",
+                "uri": "/api/admin/restaurants"
+            },
+            {
+                "name": "Admin Restaurant Status",
+                "uri": "/api/admin/restaurants"
+            },
+            {
+                "name": "Admin Orders",
+                "uri": "/api/admin/orders"
             }
         ]
 }
