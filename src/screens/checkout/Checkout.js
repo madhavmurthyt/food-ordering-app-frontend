@@ -35,6 +35,9 @@ class Checkout extends React.Component {
             restaurantName: null,
             orderItems: null,
             netAmount: 0,
+            couponName: null,
+            discountPercent: 0,
+            discountAmount: 0,
         };
         this.handleOrderConfirmation = this.handleOrderConfirmation.bind(this);
         this.placeOrder = this.placeOrder.bind(this);
@@ -45,6 +48,8 @@ class Checkout extends React.Component {
         this.setStates = this.setStates.bind(this);
         this.setAddresses = this.setAddresses.bind(this);
         this.saveAddress = this.saveAddress.bind(this);
+        this.handleApplyCoupon = this.handleApplyCoupon.bind(this);
+        this.handleRemoveCoupon = this.handleRemoveCoupon.bind(this);
         this.msgSaveOrderNotOK = "Unable to place your order! Please try again!";
         this.msgOrderIncomplete = "Please select delivery address & payment method before placing an order!";
         this.msgSaveOrderOK = "Order placed successfully! Your order ID is $orderId.";
@@ -89,6 +94,15 @@ class Checkout extends React.Component {
         } else {
             this.showNotification(this.msgSaveOrderNotOK);
         }
+    };
+
+    handleApplyCoupon = (name, percent) => {
+        const discountAmount = (this.state.netAmount * percent) / 100;
+        this.setState({ couponName: name, discountPercent: percent, discountAmount: discountAmount });
+    };
+
+    handleRemoveCoupon = () => {
+        this.setState({ couponName: null, discountPercent: 0, discountAmount: 0 });
     };
 
     showNotification = (message) => this.setState({ messageText: message, notificationOpen: true });
@@ -147,12 +161,18 @@ class Checkout extends React.Component {
 
     placeOrder = () => {
         if (this.state.activeStep === 2) {
+            const orderPayload = { ...this.state.order };
+            if (this.state.discountAmount > 0) {
+                orderPayload.discount = this.state.discountAmount;
+                orderPayload.coupon_name = this.state.couponName;
+                orderPayload.bill = this.state.netAmount - this.state.discountAmount;
+            }
             CallApi(
                 GetEndpointURI("Save Order"),
                 GetHttpHeaders(
                     "POST",
                     "Bearer " + window.sessionStorage.getItem("access-token"),
-                    JSON.stringify(this.state.order)
+                    JSON.stringify(orderPayload)
                 ),
                 this.handleOrderConfirmation
             );
@@ -313,6 +333,10 @@ class Checkout extends React.Component {
                                 orderItems={this.state.orderItems}
                                 order={this.state.order}
                                 handlePlaceOrder={this.placeOrder}
+                                discount={this.state.discountAmount}
+                                couponName={this.state.couponName}
+                                onApplyCoupon={this.handleApplyCoupon}
+                                onRemoveCoupon={this.handleRemoveCoupon}
                             />
                         </Box>
                     </Box>

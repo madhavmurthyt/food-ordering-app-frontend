@@ -1,10 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Rating from "@mui/material/Rating";
+import Snackbar from "@mui/material/Snackbar";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import Config from "../utils/Config";
+import { isLoggedIn, getAccessToken } from "../utils/AuthGuard";
 
-export default function DetailsRCard({ restaurant }) {
+export default function DetailsRCard({ restaurant, onRatingUpdate }) {
+    const [rated, setRated] = useState(false);
+    const [snackOpen, setSnackOpen] = useState(false);
+    const [snackMsg, setSnackMsg] = useState("");
+
+    const handleRate = (event, newValue) => {
+        if (!newValue) return;
+        if (!isLoggedIn()) {
+            setSnackMsg("Please login to rate!");
+            setSnackOpen(true);
+            return;
+        }
+        const uri =
+            Config.endpointPrefix +
+            "/api/restaurant/" +
+            restaurant.id +
+            "?customer_rating=" +
+            newValue;
+        fetch(uri, {
+            method: "PUT",
+            headers: {
+                Accept: "application/json",
+                authorization: "Bearer " + getAccessToken(),
+            },
+        })
+            .then((res) => {
+                if (!res.ok) throw res;
+                return res.json();
+            })
+            .then((data) => {
+                setRated(true);
+                setSnackMsg("Thanks for rating!");
+                setSnackOpen(true);
+                if (onRatingUpdate) {
+                    onRatingUpdate(data.customer_rating, data.number_customers_rated);
+                }
+            })
+            .catch(() => {
+                setSnackMsg("Failed to submit rating. Please try again.");
+                setSnackOpen(true);
+            });
+    };
+
     return (
         <Box
             sx={{
@@ -55,7 +101,7 @@ export default function DetailsRCard({ restaurant }) {
                             .map((c) => c.category_name)
                             .join(", ")}
                 </Typography>
-                <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+                <Box sx={{ display: "flex", gap: 3, alignItems: "center", flexWrap: "wrap" }}>
                     <Box
                         sx={{
                             display: "flex",
@@ -87,8 +133,28 @@ export default function DetailsRCard({ restaurant }) {
                             {restaurant.average_price} for two
                         </Typography>
                     </Box>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                            {rated ? "Rated:" : "Rate:"}
+                        </Typography>
+                        <Rating
+                            precision={0.5}
+                            disabled={rated}
+                            onChange={handleRate}
+                            sx={{
+                                "& .MuiRating-iconFilled": { color: "#FFB74D" },
+                                "& .MuiRating-iconEmpty": { color: "rgba(255,255,255,0.4)" },
+                            }}
+                        />
+                    </Box>
                 </Box>
             </Box>
+            <Snackbar
+                open={snackOpen}
+                autoHideDuration={3000}
+                onClose={() => setSnackOpen(false)}
+                message={snackMsg}
+            />
         </Box>
     );
 }

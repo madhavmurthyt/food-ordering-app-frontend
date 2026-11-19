@@ -49,7 +49,10 @@ class Details extends Component {
 
                 {this.state.restaurant !== null && (
                     <>
-                        <DetailsRCard restaurant={this.state.restaurant} />
+                        <DetailsRCard
+                            restaurant={this.state.restaurant}
+                            onRatingUpdate={this.handleRatingUpdate}
+                        />
 
                         <Box sx={{ px: { xs: 2, md: 4 }, py: 3 }}>
                             <Grid container spacing={3}>
@@ -110,7 +113,10 @@ class Details extends Component {
             this.props.baseUrl + "restaurant/" + this.props.params.restaurantId;
         this.setState({ loading: true });
         return fetch(url, { method: "GET", headers })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) throw response;
+                return response.json();
+            })
             .then((jsonResponse) => {
                 this.setState({
                     restaurant: jsonResponse,
@@ -119,7 +125,7 @@ class Details extends Component {
             })
             .catch((error) => {
                 console.log("error fetching restaurant", error);
-                this.setState({ loading: false });
+                this.setState({ restaurant: null, loading: false });
             });
     }
 
@@ -130,14 +136,28 @@ class Details extends Component {
             "item/restaurant/" +
             this.props.params.restaurantId;
         fetch(url, { method: "GET", headers })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) throw response;
+                return response.json();
+            })
             .then((jsonResponse) => {
                 this.setState({ popularItems: jsonResponse || [] });
             })
             .catch((error) => {
                 console.log("error fetching popular items", error);
+                this.setState({ popularItems: [] });
             });
     }
+
+    handleRatingUpdate = (newRating, newCount) => {
+        this.setState((prev) => ({
+            restaurant: {
+                ...prev.restaurant,
+                customer_rating: newRating,
+                number_customers_rated: newCount,
+            },
+        }));
+    };
 
     showNotification = (message) =>
         this.setState({ messageText: message, notificationOpen: true });

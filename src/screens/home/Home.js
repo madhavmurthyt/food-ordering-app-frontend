@@ -106,16 +106,19 @@ class Home extends Component {
         let url = this.props.baseUrl + "restaurant";
         this.setState({ loading: true });
         return fetch(url, { method: "GET", headers })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) throw response;
+                return response.json();
+            })
             .then((jsonResponse) => {
                 this.setState({
-                    restaurants: jsonResponse.restaurants,
+                    restaurants: jsonResponse.restaurants || [],
                     loading: false,
                 });
             })
             .catch((error) => {
                 console.log("error fetching restaurants", error);
-                this.setState({ loading: false });
+                this.setState({ restaurants: [], loading: false });
             });
     };
 
@@ -123,7 +126,10 @@ class Home extends Component {
         const headers = { Accept: "application/json" };
         let url = this.props.baseUrl + "category";
         return fetch(url, { method: "GET", headers })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) throw response;
+                return response.json();
+            })
             .then((jsonResponse) => {
                 this.setState({ categories: jsonResponse.categories || [] });
             })
@@ -142,7 +148,10 @@ class Home extends Component {
                 this.props.baseUrl + "restaurant/category/" + category.id;
             this.setState({ loading: true });
             fetch(url, { method: "GET", headers })
-                .then((response) => response.json())
+                .then((response) => {
+                    if (!response.ok) throw response;
+                    return response.json();
+                })
                 .then((jsonResponse) => {
                     this.setState({
                         restaurants: jsonResponse.restaurants || [],
@@ -151,7 +160,7 @@ class Home extends Component {
                 })
                 .catch((error) => {
                     console.log("error fetching by category", error);
-                    this.setState({ loading: false });
+                    this.setState({ restaurants: [], loading: false });
                 });
         }
     };
@@ -165,7 +174,10 @@ class Home extends Component {
             this.getRestaurants();
         } else {
             return fetch(url, { method: "GET", headers })
-                .then((response) => response.json())
+                .then((response) => {
+                    if (!response.ok) throw response;
+                    return response.json();
+                })
                 .then((jsonResponse) => {
                     this.setState({
                         restaurants: jsonResponse.restaurants || [],
@@ -174,7 +186,7 @@ class Home extends Component {
                 })
                 .catch((error) => {
                     console.log("error searching restaurants", error);
-                    this.setState({ loading: false });
+                    this.setState({ restaurants: [], loading: false });
                 });
         }
     };
