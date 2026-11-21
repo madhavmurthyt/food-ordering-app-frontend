@@ -1,9 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import brand from "../../theme/brand";
 
 export default function Footer() {
+    const navigate = useNavigate();
     return (
         <Box
             component="footer"
@@ -21,6 +23,16 @@ export default function Footer() {
             </Typography>
             <Typography variant="caption" sx={{ mt: 0.5, display: "block" }}>
                 Made with care for food lovers everywhere
+            </Typography>
+            <Typography
+                variant="caption"
+                onClick={() => navigate("/for-restaurants")}
+                sx={{
+                    mt: 1, display: "inline-block", cursor: "pointer",
+                    color: "#FF9800", "&:hover": { textDecoration: "underline" },
+                }}
+            >
+                Partner with us
             </Typography>
         </Box>
     );

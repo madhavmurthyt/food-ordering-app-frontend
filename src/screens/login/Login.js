@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -16,9 +16,11 @@ import { isLoggedIn } from "../../common/utils/AuthGuard";
 
 export default function Login() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const isRestaurantOwnerFlow = searchParams.get("role") === "restaurant_owner";
     const googleBtnRef = useRef(null);
 
-    const [mode, setMode] = useState("login");
+    const [mode, setMode] = useState(isRestaurantOwnerFlow ? "signup" : "login");
     const [contactno, setContactno] = useState("");
     const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -31,11 +33,22 @@ export default function Login() {
     const [apiError, setApiError] = useState("");
     const [notification, setNotification] = useState({ open: false, message: "" });
 
-    useEffect(() => {
-        if (isLoggedIn()) {
+    const redirectAfterAuth = useCallback(() => {
+        const inviteToken = sessionStorage.getItem("invite-redirect");
+        if (inviteToken) {
+            navigate("/invite/" + inviteToken);
+        } else if (isRestaurantOwnerFlow || sessionStorage.getItem("role") === "RESTAURANT_OWNER") {
+            navigate("/my-restaurant");
+        } else {
             navigate("/");
         }
-    }, [navigate]);
+    }, [navigate, isRestaurantOwnerFlow]);
+
+    useEffect(() => {
+        if (isLoggedIn()) {
+            redirectAfterAuth();
+        }
+    }, [redirectAfterAuth]);
 
     const handleGoogleResponse = useCallback(
         (response) => {
@@ -64,13 +77,13 @@ export default function Login() {
                     sessionStorage.setItem("uuid", data.id);
                     sessionStorage.setItem("first-name", data.first_name);
                     if (data.role) sessionStorage.setItem("role", data.role);
-                    navigate("/");
+                    redirectAfterAuth();
                 })
                 .catch(() => {
                     setApiError("Google sign-in failed. Please try again.");
                 });
         },
-        [navigate]
+        [redirectAfterAuth]
     );
 
     useEffect(() => {
@@ -125,7 +138,7 @@ export default function Login() {
                 sessionStorage.setItem("uuid", data.id);
                 sessionStorage.setItem("first-name", data.first_name);
                 if (data.role) sessionStorage.setItem("role", data.role);
-                navigate("/");
+                redirectAfterAuth();
             })
             .catch((err) => {
                 if (err.text) {

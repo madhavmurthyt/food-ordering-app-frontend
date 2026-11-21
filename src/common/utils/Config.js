@@ -73,6 +73,46 @@ var Config = {
             {
                 "name": "Admin Orders",
                 "uri": "/api/admin/orders"
+            },
+            {
+                "name": "Admin Create Restaurant",
+                "uri": "/api/admin/restaurants"
+            },
+            {
+                "name": "Admin Restaurant Items",
+                "uri": "/api/admin/restaurants"
+            },
+            {
+                "name": "Get Categories",
+                "uri": "/api/category"
+            },
+            {
+                "name": "Admin Generate Invite",
+                "uri": "/api/admin/restaurants"
+            },
+            {
+                "name": "Validate Invite",
+                "uri": "/api/invite"
+            },
+            {
+                "name": "Claim Invite",
+                "uri": "/api/invite"
+            },
+            {
+                "name": "Owner My Restaurants",
+                "uri": "/api/restaurant/mine"
+            },
+            {
+                "name": "Owner Create Restaurant",
+                "uri": "/api/restaurant"
+            },
+            {
+                "name": "Owner Restaurant",
+                "uri": "/api/restaurant"
+            },
+            {
+                "name": "Owner Restaurant Item",
+                "uri": "/api/restaurant"
             }
         ]
 }

@@ -6,6 +6,9 @@ import Checkout from "./screens/checkout/Checkout";
 import Profile from "./screens/profile/Profile"
 import Login from "./screens/login/Login"
 import Admin from "./screens/admin/Admin"
+import InvitePage from "./screens/invite/InvitePage"
+import MyRestaurants from "./screens/owner/MyRestaurants"
+import ForRestaurants from "./screens/marketing/ForRestaurants"
 import Config from "./common/utils/Config";
 
 const baseUrl = Config.endpointPrefix + "/api/";
@@ -27,6 +30,9 @@ export default function FoodOrderingApp() {
             <Route path="/profile" element={<Profile/>}/>
             <Route path="/login" element={<Login/>}/>
             <Route path="/admin" element={<Admin/>}/>
+            <Route path="/invite/:token" element={<InvitePage/>}/>
+            <Route path="/my-restaurant" element={<MyRestaurants/>}/>
+            <Route path="/for-restaurants" element={<ForRestaurants/>}/>
         </Routes>
         </>
     );
