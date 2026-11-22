@@ -11,11 +11,14 @@ import Header from "../../common/header/Header";
 import OrderHistory from "../../common/profile/OrderHistory";
 import AddressManager from "../../common/profile/AddressManager";
 import Notification from "../../common/notification/Notification";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
 import Config from "../../common/utils/Config";
 import { GetEndpointURI, GetHttpHeaders, CallApi } from "../../common/utils/ApiHelper";
 import withRouter from "../../common/utils/withRouter";
 import Footer from "../../common/footer/Footer";
 import { isLoggedIn } from "../../common/utils/AuthGuard";
+import HomeRCard from "../../common/home/HomeRCard";
 
 class Profile extends Component {
     constructor(props) {
@@ -33,6 +36,8 @@ class Profile extends Component {
             confirmPassword: "",
             messageText: null,
             notificationOpen: false,
+            favorites: [],
+            favoritesLoading: false,
         };
     }
 
@@ -43,6 +48,7 @@ class Profile extends Component {
         }
         this.fetchOrders();
         this.fetchAddresses();
+        this.fetchFavorites();
     }
 
     fetchOrders = () => {
@@ -146,6 +152,42 @@ class Profile extends Component {
                 }
             })
             .catch(() => this.showNotification("Unable to change password. Check your old password."));
+    };
+
+    fetchFavorites = () => {
+        this.setState({ favoritesLoading: true });
+        const uri = Config.endpointPrefix +
+            Config.endpoints.find((e) => e.name === "Customer Favorites").uri;
+        fetch(uri, {
+            headers: {
+                Accept: "application/json",
+                authorization: "Bearer " + sessionStorage.getItem("access-token"),
+            },
+        })
+            .then((r) => { if (!r.ok) throw r; return r.json(); })
+            .then((data) => this.setState({ favorites: data.restaurants || [], favoritesLoading: false }))
+            .catch(() => this.setState({ favorites: [], favoritesLoading: false }));
+    };
+
+    removeFavorite = (restaurantId) => {
+        const uri = Config.endpointPrefix +
+            Config.endpoints.find((e) => e.name === "Customer Favorites").uri +
+            "/" + restaurantId;
+        fetch(uri, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                authorization: "Bearer " + sessionStorage.getItem("access-token"),
+            },
+        })
+            .then((r) => { if (!r.ok) throw r; })
+            .then(() => {
+                this.setState((prev) => ({
+                    favorites: prev.favorites.filter((f) => f.id !== restaurantId),
+                }));
+                this.showNotification("Removed from favorites.");
+            })
+            .catch(() => this.showNotification("Failed to remove favorite."));
     };
 
     showNotification = (message) =>

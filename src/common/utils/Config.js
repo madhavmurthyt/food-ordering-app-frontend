@@ -113,6 +113,14 @@ var Config = {
             {
                 "name": "Owner Restaurant Item",
                 "uri": "/api/restaurant"
+            },
+            {
+                "name": "Order Status",
+                "uri": "/api/order"
+            },
+            {
+                "name": "Customer Favorites",
+                "uri": "/api/customer/favorites"
             }
         ]
 }

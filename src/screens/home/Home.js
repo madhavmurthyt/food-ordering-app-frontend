@@ -10,6 +10,7 @@ import CategoryBar from "../../common/home/CategoryBar";
 import HomeRCard from "../../common/home/HomeRCard";
 import withRouter from "../../common/utils/withRouter";
 import Footer from "../../common/footer/Footer";
+import Config from "../../common/utils/Config";
 
 class Home extends Component {
     constructor() {
@@ -19,6 +20,7 @@ class Home extends Component {
             categories: [],
             activeCategory: null,
             loading: false,
+            favoriteIds: new Set(),
         };
     }
 
@@ -26,6 +28,7 @@ class Home extends Component {
         this.mounted = true;
         this.getRestaurants();
         this.getCategories();
+        this.fetchFavorites();
     }
 
     handleRestaurantNavigation = (restaurantId) => {
@@ -90,6 +93,9 @@ class Home extends Component {
                                         handleRestaurantNavigation={
                                             this.handleRestaurantNavigation
                                         }
+                                        showFavorite={this.isLoggedIn()}
+                                        isFavorite={this.state.favoriteIds.has(restaurant.id)}
+                                        onToggleFavorite={this.toggleFavorite}
                                     />
                                 </Grid>
                             ))}
@@ -163,6 +169,49 @@ class Home extends Component {
                     this.setState({ restaurants: [], loading: false });
                 });
         }
+    };
+
+    isLoggedIn = () => sessionStorage.getItem("access-token") != null;
+
+    fetchFavorites = () => {
+        if (!this.isLoggedIn()) return;
+        const uri = Config.endpointPrefix +
+            Config.endpoints.find((e) => e.name === "Customer Favorites").uri;
+        fetch(uri, {
+            headers: {
+                Accept: "application/json",
+                authorization: "Bearer " + sessionStorage.getItem("access-token"),
+            },
+        })
+            .then((r) => { if (!r.ok) throw r; return r.json(); })
+            .then((data) => {
+                const ids = new Set((data.restaurants || []).map((r) => r.id));
+                this.setState({ favoriteIds: ids });
+            })
+            .catch(() => {});
+    };
+
+    toggleFavorite = (restaurantId) => {
+        if (!this.isLoggedIn()) return;
+        const isFav = this.state.favoriteIds.has(restaurantId);
+        const uri = Config.endpointPrefix +
+            Config.endpoints.find((e) => e.name === "Customer Favorites").uri +
+            "/" + restaurantId;
+        fetch(uri, {
+            method: isFav ? "DELETE" : "POST",
+            headers: {
+                Accept: "application/json",
+                authorization: "Bearer " + sessionStorage.getItem("access-token"),
+            },
+        })
+            .then((r) => { if (!r.ok) throw r; })
+            .then(() => {
+                const updated = new Set(this.state.favoriteIds);
+                if (isFav) updated.delete(restaurantId);
+                else updated.add(restaurantId);
+                this.setState({ favoriteIds: updated });
+            })
+            .catch(() => {});
     };
 
     searchHandler = (event) => {

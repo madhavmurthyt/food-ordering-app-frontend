@@ -89,8 +89,8 @@ class Checkout extends React.Component {
         if (result) {
             this.showNotification(this.msgSaveOrderOK.replace("$orderId", response.id));
             setTimeout(() => {
-                this.props.navigate("/");
-            }, 3000);
+                this.props.navigate("/order/" + response.id + "/track");
+            }, 2000);
         } else {
             this.showNotification(this.msgSaveOrderNotOK);
         }

@@ -5,10 +5,13 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
-export default function HomeRCard({ restaurant, handleRestaurantNavigation }) {
+export default function HomeRCard({ restaurant, handleRestaurantNavigation, isFavorite, onToggleFavorite, showFavorite }) {
     return (
         <Card
             sx={{
@@ -20,9 +23,25 @@ export default function HomeRCard({ restaurant, handleRestaurantNavigation }) {
                     transform: "translateY(-4px)",
                     boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
                 },
+                position: "relative",
             }}
             onClick={() => handleRestaurantNavigation(restaurant.id)}
         >
+            {showFavorite && (
+                <IconButton
+                    size="small"
+                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(restaurant.id); }}
+                    sx={{
+                        position: "absolute", top: 8, right: 8, zIndex: 1,
+                        bgcolor: "rgba(255,255,255,0.85)",
+                        "&:hover": { bgcolor: "rgba(255,255,255,0.95)" },
+                    }}
+                >
+                    {isFavorite
+                        ? <FavoriteIcon sx={{ color: "#E23744" }} />
+                        : <FavoriteBorderIcon sx={{ color: "#666" }} />}
+                </IconButton>
+            )}
             <CardActionArea>
                 <CardMedia
                     component="img"
