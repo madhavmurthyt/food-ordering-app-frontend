@@ -69,6 +69,62 @@ describe("Header – logged in", () => {
     });
 });
 
+describe("Header – role-aware menu items", () => {
+    test("RESTAURANT_OWNER sees My Restaurant link", () => {
+        sessionStorage.setItem("access-token", "test-token");
+        sessionStorage.setItem("first-name", "Owner");
+        sessionStorage.setItem("uuid", "u1");
+        sessionStorage.setItem("role", "RESTAURANT_OWNER");
+        renderHeader();
+        fireEvent.click(screen.getByText("Owner"));
+        expect(screen.getByText("My Restaurant")).toBeInTheDocument();
+        expect(screen.getByRole("menuitem", { name: /My Restaurant/i }))
+            .toHaveAttribute("href", "/my-restaurant");
+    });
+
+    test("ADMIN sees Admin Dashboard link", () => {
+        sessionStorage.setItem("access-token", "test-token");
+        sessionStorage.setItem("first-name", "Admin");
+        sessionStorage.setItem("uuid", "u1");
+        sessionStorage.setItem("role", "ADMIN");
+        renderHeader();
+        fireEvent.click(screen.getByText("Admin"));
+        expect(screen.getByText("Admin Dashboard")).toBeInTheDocument();
+        expect(screen.getByRole("menuitem", { name: /Admin Dashboard/i }))
+            .toHaveAttribute("href", "/admin");
+    });
+
+    test("RESTAURANT_OWNER does not see Admin Dashboard", () => {
+        sessionStorage.setItem("access-token", "test-token");
+        sessionStorage.setItem("first-name", "Owner");
+        sessionStorage.setItem("uuid", "u1");
+        sessionStorage.setItem("role", "RESTAURANT_OWNER");
+        renderHeader();
+        fireEvent.click(screen.getByText("Owner"));
+        expect(screen.queryByText("Admin Dashboard")).not.toBeInTheDocument();
+    });
+
+    test("ADMIN does not see My Restaurant", () => {
+        sessionStorage.setItem("access-token", "test-token");
+        sessionStorage.setItem("first-name", "Admin");
+        sessionStorage.setItem("uuid", "u1");
+        sessionStorage.setItem("role", "ADMIN");
+        renderHeader();
+        fireEvent.click(screen.getByText("Admin"));
+        expect(screen.queryByText("My Restaurant")).not.toBeInTheDocument();
+    });
+
+    test("regular user sees neither My Restaurant nor Admin Dashboard", () => {
+        sessionStorage.setItem("access-token", "test-token");
+        sessionStorage.setItem("first-name", "Alice");
+        sessionStorage.setItem("uuid", "u1");
+        renderHeader();
+        fireEvent.click(screen.getByText("Alice"));
+        expect(screen.queryByText("My Restaurant")).not.toBeInTheDocument();
+        expect(screen.queryByText("Admin Dashboard")).not.toBeInTheDocument();
+    });
+});
+
 describe("Header – search bar", () => {
     test("search bar hidden when showSearch is false", () => {
         renderHeader({ showSearch: false });
