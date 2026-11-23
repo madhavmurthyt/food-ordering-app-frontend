@@ -61,6 +61,7 @@ class Header extends Component {
         sessionStorage.removeItem("uuid");
         sessionStorage.removeItem("first-name");
         sessionStorage.removeItem("role");
+        sessionStorage.removeItem("invite-redirect");
         this.setState({ loggedIn: false });
         this.handleMenuClose();
     };
@@ -227,6 +228,26 @@ class Header extends Component {
                                     >
                                         My Profile
                                     </MenuItem>
+                                    {sessionStorage.getItem("role") === "RESTAURANT_OWNER" && (
+                                        <MenuItem
+                                            component={Link}
+                                            to="/my-restaurant"
+                                            onClick={this.handleMenuClose}
+                                            sx={{ py: 1.5 }}
+                                        >
+                                            My Restaurant
+                                        </MenuItem>
+                                    )}
+                                    {sessionStorage.getItem("role") === "ADMIN" && (
+                                        <MenuItem
+                                            component={Link}
+                                            to="/admin"
+                                            onClick={this.handleMenuClose}
+                                            sx={{ py: 1.5 }}
+                                        >
+                                            Admin Dashboard
+                                        </MenuItem>
+                                    )}
                                     <MenuItem
                                         onClick={this.logout}
                                         sx={{ py: 1.5 }}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -27,7 +27,7 @@ export default function OrderTracking() {
     const [error, setError] = useState("");
     const intervalRef = useRef(null);
 
-    const fetchStatus = () => {
+    const fetchStatus = useCallback(() => {
         const uri = Config.endpointPrefix +
             Config.endpoints.find((e) => e.name === "Order Status").uri +
             "/" + orderId + "/status";
@@ -40,13 +40,13 @@ export default function OrderTracking() {
             .then((r) => { if (!r.ok) throw r; return r.json(); })
             .then((data) => { setOrder(data); setLoading(false); })
             .catch(() => { setError("Unable to load order status."); setLoading(false); });
-    };
+    }, [orderId]);
 
     useEffect(() => {
         fetchStatus();
         intervalRef.current = setInterval(fetchStatus, 30000);
         return () => clearInterval(intervalRef.current);
-    }, [orderId]);
+    }, [fetchStatus]);
 
     useEffect(() => {
         if (order && order.status === "DELIVERED") {

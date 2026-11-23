@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -20,6 +20,7 @@ export default function InvitePage() {
     const [error, setError] = useState("");
     const [claiming, setClaiming] = useState(false);
     const [claimed, setClaimed] = useState(false);
+    const autoClaimAttempted = useRef(false);
 
     useEffect(() => {
         const uri = Config.endpointPrefix +
@@ -38,7 +39,7 @@ export default function InvitePage() {
             .catch(() => { setError("Failed to validate invite link."); setLoading(false); });
     }, [token]);
 
-    const handleClaim = () => {
+    const handleClaim = useCallback(() => {
         if (!isLoggedIn()) {
             sessionStorage.setItem("invite-redirect", token);
             navigate("/login");
@@ -74,17 +75,19 @@ export default function InvitePage() {
                     setError("Failed to claim invite.");
                 }
             });
-    };
+    }, [token, navigate]);
 
     useEffect(() => {
+        if (autoClaimAttempted.current) return;
         if (isLoggedIn() && invite && !claimed) {
             const pending = sessionStorage.getItem("invite-redirect");
             if (pending === token) {
+                autoClaimAttempted.current = true;
                 sessionStorage.removeItem("invite-redirect");
                 handleClaim();
             }
         }
-    });
+    }, [invite, claimed, token, handleClaim]);
 
     if (loading) {
         return (
@@ -115,8 +118,8 @@ export default function InvitePage() {
                             <Typography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
                                 You are now the owner of <strong>{invite.restaurant_name}</strong>.
                             </Typography>
-                            <Button variant="contained" onClick={() => navigate("/")}>
-                                Go to Home
+                            <Button variant="contained" onClick={() => navigate("/my-restaurant")}>
+                                Go to My Restaurant
                             </Button>
                         </>
                     ) : (

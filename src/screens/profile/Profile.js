@@ -240,6 +240,7 @@ class Profile extends Component {
                         indicatorColor="primary"
                     >
                         <Tab label="Orders" sx={{ textTransform: "none" }} />
+                        <Tab label="Favorites" sx={{ textTransform: "none" }} />
                         <Tab label="Addresses" sx={{ textTransform: "none" }} />
                         <Tab label="Settings" sx={{ textTransform: "none" }} />
                     </Tabs>
@@ -251,8 +252,39 @@ class Profile extends Component {
                         <OrderHistory orders={this.state.orders} />
                     )}
 
-                    {/* Addresses Tab */}
+                    {/* Favorites Tab */}
                     {this.state.activeTab === 1 && (
+                        this.state.favoritesLoading ? (
+                            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                                <CircularProgress />
+                            </Box>
+                        ) : this.state.favorites.length === 0 ? (
+                            <Box sx={{ textAlign: "center", py: 8 }}>
+                                <Typography variant="h6" sx={{ color: "text.secondary" }}>
+                                    No favorites yet. Heart a restaurant on the home page!
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Grid container spacing={3}>
+                                {this.state.favorites.map((restaurant) => (
+                                    <Grid item xs={12} sm={6} md={4} key={restaurant.id}>
+                                        <HomeRCard
+                                            restaurant={restaurant}
+                                            handleRestaurantNavigation={(id) =>
+                                                this.props.navigate("/restaurant/" + id)
+                                            }
+                                            showFavorite
+                                            isFavorite
+                                            onToggleFavorite={this.removeFavorite}
+                                        />
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        )
+                    )}
+
+                    {/* Addresses Tab */}
+                    {this.state.activeTab === 2 && (
                         <AddressManager
                             addresses={this.state.addresses}
                             onDeleteAddress={this.handleDeleteAddress}
@@ -260,7 +292,7 @@ class Profile extends Component {
                     )}
 
                     {/* Settings Tab */}
-                    {this.state.activeTab === 2 && (
+                    {this.state.activeTab === 3 && (
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 4, py: 2 }}>
                             {/* Update Name */}
                             <Box>

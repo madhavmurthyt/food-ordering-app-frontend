@@ -9,6 +9,7 @@ import Admin from "./screens/admin/Admin"
 import InvitePage from "./screens/invite/InvitePage"
 import MyRestaurants from "./screens/owner/MyRestaurants"
 import ForRestaurants from "./screens/marketing/ForRestaurants"
+import OrderTracking from "./screens/order/OrderTracking"
 import Config from "./common/utils/Config";
 
 const baseUrl = Config.endpointPrefix + "/api/";
@@ -33,6 +34,7 @@ export default function FoodOrderingApp() {
             <Route path="/invite/:token" element={<InvitePage/>}/>
             <Route path="/my-restaurant" element={<MyRestaurants/>}/>
             <Route path="/for-restaurants" element={<ForRestaurants/>}/>
+            <Route path="/order/:orderId/track" element={<OrderTracking/>}/>
         </Routes>
         </>
     );
