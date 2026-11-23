@@ -125,9 +125,8 @@ describe("MenuItemsPanel", () => {
         });
         fireEvent.click(screen.getByRole("button", { name: /Add Item/i }));
         await waitFor(() => {
-            expect(screen.getByText("Add Item")).toBeInTheDocument();
+            expect(screen.getByLabelText(/Item Name/i)).toBeInTheDocument();
         });
-        expect(screen.getByLabelText(/Item Name/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/Price/i)).toBeInTheDocument();
     });
 
@@ -138,7 +137,7 @@ describe("MenuItemsPanel", () => {
         });
         fireEvent.click(screen.getByRole("button", { name: /Add Item/i }));
         await waitFor(() => {
-            expect(screen.getByText("Add Item")).toBeInTheDocument();
+            expect(screen.getByLabelText(/Item Name/i)).toBeInTheDocument();
         });
         fireEvent.click(screen.getByRole("button", { name: /Save/i }));
         expect(screen.getByText("Item name is required.")).toBeInTheDocument();

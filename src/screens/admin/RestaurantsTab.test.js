@@ -64,8 +64,8 @@ describe("RestaurantsTab", () => {
         expect(screen.getByText("Name")).toBeInTheDocument();
         expect(screen.getByText("Rating")).toBeInTheDocument();
         expect(screen.getByText("Avg Price")).toBeInTheDocument();
-        expect(screen.getByText("Status")).toBeInTheDocument();
-        expect(screen.getByText("Action")).toBeInTheDocument();
+        expect(screen.getByRole("columnheader", { name: "Status" })).toBeInTheDocument();
+        expect(screen.getByRole("columnheader", { name: "Action" })).toBeInTheDocument();
     });
 
     test("renders restaurant names from API", async () => {
@@ -131,7 +131,7 @@ describe("RestaurantsTab", () => {
         });
         fireEvent.click(screen.getByRole("button", { name: /Add Restaurant/i }));
         await waitFor(() => {
-            expect(screen.getByText("Add Restaurant")).toBeInTheDocument();
+            expect(screen.getByRole("heading", { name: /Add Restaurant/i })).toBeInTheDocument();
         });
     });
 
