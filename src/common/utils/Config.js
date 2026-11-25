@@ -121,6 +121,10 @@ var Config = {
             {
                 "name": "Customer Favorites",
                 "uri": "/api/customer/favorites"
+            },
+            {
+                "name": "Admin Import Restaurants",
+                "uri": "/api/admin/restaurants/import"
             }
         ]
 }

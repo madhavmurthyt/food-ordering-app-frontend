@@ -1,6 +1,14 @@
 # Food Ordering App — Frontend
 
-A React single-page application for browsing restaurants, managing a shopping cart, and placing food orders. Built with React 16, Material-UI v4, and React Router v5.
+A React single-page application for browsing restaurants, managing a shopping cart, and placing food orders. Built with React 18, MUI v5, and React Router v6.
+
+## Quick Start
+
+```bash
+./restart.sh
+```
+
+This kills any existing frontend on port 3000, installs dependencies, and starts the dev server at `http://localhost:3000`.
 
 ## Prerequisites
 
@@ -10,6 +18,12 @@ A React single-page application for browsing restaurants, managing a shopping ca
 
 ## Getting Started
 
+**Option 1 — Restart script** (recommended):
+```bash
+./restart.sh
+```
+
+**Option 2 — Manual:**
 1. Install dependencies:
    ```bash
    npm install
@@ -59,25 +73,36 @@ src/
 
 | Route | Page | Description |
 |---|---|---|
-| `/` | Home | Browse all restaurants, search by name |
-| `/restaurant/:id` | Details | View restaurant menu, add items to cart |
-| `/checkout` | Checkout | Select address, payment method, place order |
-| `/profile` | Profile | User profile (not yet implemented) |
+| `/` | Home | Browse restaurants, search by name, category filter |
+| `/restaurant/:id` | Details | View menu, add items to cart, rate restaurant |
+| `/checkout` | Checkout | Address → payment → coupon → place order |
+| `/profile` | Profile | Order history, addresses, settings |
+| `/login` | Login | Google SSO + phone/email/password login |
+| `/admin` | Admin | Dashboard, restaurants (CRUD + approve), users, orders |
+| `/my-restaurant` | Owner Portal | Manage own restaurants + menu items |
+| `/for-restaurants` | Partner Landing | Marketing page for restaurant owners |
+| `/invite/:token` | Invite | Claim restaurant ownership via admin invite link |
 
 ## Features
 
-- **Login/Signup** — Modal in the header with form validation (email, password strength, 10-digit contact)
+- **Google SSO + Email/Phone Login** — Dedicated `/login` page with Google Sign-In and password fallback
+- **Role-Based Access** — CUSTOMER, RESTAURANT_OWNER, DRIVER, ADMIN roles with route guards
+- **Admin Dashboard** — Stats, restaurant management (create/approve/suspend), user roles, orders
+- **Restaurant Owner Portal** — Create restaurant, manage menu, view orders
+- **Invite Links** — Admin generates link, owner claims restaurant ownership
+- **Restaurant Rating** — MUI Rating component, logged-in users only
+- **Coupon Support** — Apply/remove coupons at checkout
 - **Restaurant Search** — Real-time search by restaurant name
 - **Shopping Cart** — Add/remove items, quantity controls, running total
-- **Checkout Flow** — Stepper: select delivery address (or add new) → select payment → confirm order
-- **Responsive Layout** — Adapts to mobile, tablet, and desktop screen widths
+- **Checkout Flow** — Stepper: address → payment → coupon → confirm order
+- **Responsive Layout** — MUI sx prop, Poppins font, coral-red theme
 
 ## API Configuration
 
-The backend URL is configured in `src/common/utils/Config.js`:
+The backend URL is configured via environment variable:
 
-```javascript
-endpointPrefix: "http://localhost:8080"
+```bash
+REACT_APP_API_URL=http://localhost:8080   # default
 ```
 
-To point to a different backend, update this value and the `baseUrl` in `src/FoodOrderingApp.js`.
+Set it in a `.env` file or export before running. See `src/common/utils/Config.js` for all endpoints.
