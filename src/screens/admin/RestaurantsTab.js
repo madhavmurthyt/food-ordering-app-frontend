@@ -22,8 +22,10 @@ import AddIcon from "@mui/icons-material/Add";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import Config from "../../common/utils/Config";
 import { getAccessToken } from "../../common/utils/AuthGuard";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import CreateRestaurantDialog from "./CreateRestaurantDialog";
 import MenuItemsPanel from "./MenuItemsPanel";
+import CsvImportDialog from "./CsvImportDialog";
 
 export default function RestaurantsTab() {
     const [restaurants, setRestaurants] = useState([]);
@@ -34,6 +36,7 @@ export default function RestaurantsTab() {
     const [selectedRestaurant, setSelectedRestaurant] = useState(null);
     const [snack, setSnack] = useState({ open: false, message: "" });
     const [statusFilter, setStatusFilter] = useState("ALL");
+    const [importOpen, setImportOpen] = useState(false);
     const rowsPerPage = 20;
 
     const fetchRestaurants = useCallback(() => {
@@ -138,9 +141,14 @@ export default function RestaurantsTab() {
                     <MenuItem value="ACTIVE">Active</MenuItem>
                     <MenuItem value="SUSPENDED">Suspended</MenuItem>
                 </TextField>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
-                    Add Restaurant
-                </Button>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button variant="outlined" startIcon={<FileUploadIcon />} onClick={() => setImportOpen(true)}>
+                        Import CSV
+                    </Button>
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
+                        Add Restaurant
+                    </Button>
+                </Box>
             </Box>
             <Paper>
                 <TableContainer>
@@ -236,6 +244,15 @@ export default function RestaurantsTab() {
                 onClose={() => setCreateOpen(false)}
                 onCreated={() => {
                     setSnack({ open: true, message: "Restaurant created!" });
+                    fetchRestaurants();
+                }}
+            />
+
+            <CsvImportDialog
+                open={importOpen}
+                onClose={() => setImportOpen(false)}
+                onImported={() => {
+                    setSnack({ open: true, message: "Restaurants imported!" });
                     fetchRestaurants();
                 }}
             />
